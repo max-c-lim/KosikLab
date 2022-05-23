@@ -1,7 +1,9 @@
 # Ignore __pycache__
 **__pycache__**
-# Ignore .DS_Store
+# Ignore macOS's .DS_Store
 .DS_Store
+# Ignore Pycharm's .idea
+.idea
 # Contains raw data created by scripts for testing
 data
 # Contains previous versions
