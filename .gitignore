@@ -1,0 +1,8 @@
+# Ignore __pycache__
+**__pycache__**
+# Ignore .DS_Store
+.DS_Store
+# Contains raw data created by scripts for testing
+data
+# Contains previous versions
+scripts/spikesorting/previous_versions
