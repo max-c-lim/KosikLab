@@ -6,8 +6,8 @@
 # If path is a folder with multiple recording files,
 # they will be concatenated in natural ordering.
 recording_files = [
+    # "/home/maxlim/SpikeSorting/data/wetai-gym/maxwell/tetanus/recordings/experiment1_baseline.raw.h5",
     "/home/maxlim/SpikeSorting/data/maxone/200123/2950/recordings/0uM.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/maxone/200123/2953/recordings/0uM.raw.h5",
     # "/home/maxlim/SpikeSorting/data/maxone/200123/2954/network/10h36m24s.raw.h5",
     # "/home/maxlim/SpikeSorting/data/maxone/200123/2957/network/11h24m49s.raw.h5",
     # "/home/maxlim/SpikeSorting/data/maxone/200520/5116/network/11h54m18s.raw.h5",
@@ -15,7 +15,7 @@ recording_files = [
 ]
 # List of intermediate folders where Kilosort2 files and waveforms are saved
 intermediate_folders = [
-    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950",
+    "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
@@ -26,7 +26,7 @@ intermediate_folders = [
 # List of output folders where final matlab files are saved.
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 matlab_folders = [
-    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950",
+    "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
@@ -70,13 +70,21 @@ kilosort_params = {
 
 # If True and exists, its entire parent folder is deleted and recomputed
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
-recompute_recording = False  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
-recompute_sorting = False
+recompute_recording = True  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
+recompute_sorting = True
 recompute_waveforms = False
 recompute_curation = True
 
 # Override matlab file if it exists
 override_matlab = True
+
+######################################################
+#########  PARALLEL PROCESSING PARAMETERS  ###########
+######################################################
+# Number of jobs to use for converting raw recording, extracting waveforms, and curation
+n_jobs = 64
+# Total RAM to use for converting raw recording, extracting waveforms, and curation (more memory-> faster)
+total_memory = "16G"  # Setting to another value may cause bug when converting .raw.h5 to .dat
 
 ######################################################
 ############  BANDPASS FILTER PARAMETERS  ############
@@ -117,14 +125,6 @@ fr_thresh = 0.05
 isi_viol_thresh = 0.3
 # signal-to-noise ratio (smaller values are removed)
 snr_thresh = 5
-
-######################################################
-#########  PARALLEL PROCESSING PARAMETERS  ###########
-######################################################
-# Number of jobs to use for converting raw recording, extracting waveforms, and curation
-n_jobs = 64
-# Total RAM to use for converting raw recording, extracting waveforms, and curation
-total_memory = "4G"  # Setting to another value may cause bug when converting .raw.h5 to .dat
 
 ######################################################
 ################  MATLAB PARAMETERS  #################
@@ -2869,7 +2869,7 @@ def get_paths(rec_path, inter_path):
     return rec_path, inter_path, recording_dat_path, output_folder, waveforms_raw_folder, waveforms_curated_folder
 
 
-def write_recording(recording, recording_dat_path, verbose=False):
+def write_recording(recording, recording_dat_path, verbose=True):
     print_stage("WRITING BINARY RECORDING")
     stopwatch = Stopwatch()
 
@@ -2880,7 +2880,7 @@ def write_recording(recording, recording_dat_path, verbose=False):
     if recompute_recording or not recording_dat_path.exists():
         BinaryRecordingExtractor.write_recording(recording_filtered, file_paths=recording_dat_path,
                                                  dtype='int16', total_memory=total_memory,
-                                                 n_jobs=n_jobs, verbose=False, progress_bar=verbose)
+                                                 n_jobs=n_jobs, verbose=verbose, progress_bar=verbose)
     else:
         print(f"Skipping writing recording.dat\nUsing existing {recording_dat_path} as recording file")
     stopwatch.log_time("Done writing recording.")
