@@ -119,6 +119,7 @@ class Unit:
             # In general, there should be more channels than time points
             # Transpose template to ensure (n_timepoints, n_channels)
             template = template.transpose((1, 0))
+        print(template.shape)
         return template
 
     def get_id(self):
@@ -129,16 +130,13 @@ class Unit:
         return self.dict["electrode"][0][0]
 
     def get_template_max(self):
-        # Of all the templates (one template for each channel), get the template with the largest value at any point
+        # Of all the templates (one template for each channel),
+        # get the template with the min value at any point (min value for amplitude defined as negative peak)
         # This will correspond to the cleanest template since it will be the template recorded by the closest electrode
 
         templates = self.get_template()
-        if templates.shape[1] > templates.shape[0]:
-            # In general, there should be more channels than time points
-            # Transpose template to ensure (n_channels, n_timepoints)
-            templates = templates.transpose((1, 0))
-        max_channel = templates.max(axis=1).argmax()
-        return templates[max_channel, :]
+        max_channel = templates.min(axis=0).argmin()
+        return templates[:, max_channel]
 
     def plot_templates(self, plot_all=True):
         """
@@ -167,10 +165,9 @@ def find_similar_units(mat_extractor1, mat_extractor2):
 
             train_tj_truncated = train1[:len(train2)]
             if np.allclose(train_tj_truncated, train2, rtol=0.01):
-                print(unit1.get_id())
-                print(train1)
-                print(unit2.get_id())
-                print(train2)
+                print(f"{mat_extractor1.name}: Unit ID: {unit1.get_id()}")
+                print(f"{mat_extractor2.name}: Unit ID: {unit2.get_id()}")
+                print()
 
 
 def main():
@@ -182,16 +179,19 @@ def main():
     # .mat files
     rec_num = 2950
     path_mat_tj = path_tj + f"{rec_num}_sorted.mat"
-    path_mat_mx = "/Users/maxlim/KosikLab/data/maxone/mx/0uM_sorted.mat"
-    # path_mat_mx = path_mx + f"{rec_num}_sorted.mat"
+    path_mat_mx = path_mx + f"{rec_num}_sorted.mat"
 
     # MatExtractors
     mat_tj = MatExtractor(path_mat_tj)
     mat_mx = MatExtractor(path_mat_mx)
 
-    test = mat_tj.get_units()[0]
-    plt.plot(test.get_template())
-    plt.show()
+    similar_units = [(17, 14), (28, 26)]  # (TJ_unit_id, MX_unit_id)
+
+    for tj_id, mx_id in similar_units:
+        fig, (sub1, sub2) = plt.subplots(2)
+        sub1.plot(mat_tj.get_unit(tj_id).get_template_max())
+        sub2.plot(mat_mx.get_unit(mx_id).get_template_max())
+        plt.show()
 
 
 if __name__ == "__main__":
