@@ -2,7 +2,6 @@ from extract_mat import MatExtractor
 from collections import OrderedDict
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams["font.family"] = "Times New Roman"
 import matplotlib.axes._axes as axes
 import matplotlib.figure as figure
 
@@ -48,6 +47,8 @@ def get_electrode_data(mat, size_scale=1):
 
 
 def main():
+    plt.rcParams["font.family"] = "Times New Roman"
+
     # Directory of .mat files
     data_path = "/Users/maxlim/KosikLab/data/maxone/"
     # MatExtractors
@@ -63,7 +64,7 @@ def main():
     electrode_data_mx = get_electrode_data(mat_mx, size_scale=size_scale)
 
     alpha = 0.7
-    fig, ((ax00, ax01), (ax10, ax11)) = plt.subplots(2, 2)   # type:figure.Figure, ((axes.Axes, axes.Axes), (axes.Axes, axes.Axes))
+    fig, ((ax00, ax01), (ax10, ax11)) = plt.subplots(2, 2)  # type:figure.Figure, ((axes.Axes, axes.Axes), (axes.Axes, axes.Axes))
     fig.suptitle(f"Electrode Plots of {rec_num}")
     fig.supxlabel("x location (μm)")
     fig.supylabel("y location (μm)")

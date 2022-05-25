@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.axes._axes as axes
 import numpy as np
 from extract_mat import MatExtractor
 
@@ -18,7 +19,7 @@ def compare_raster_plots(recording, mat_tj, mat_mx, time_start=120000, time_end=
     plt.show()
 
 
-def raster_plot(mat, subplot, random_time=False, time_start=None, time_end=None, title=None):
+def raster_plot(mat, subplot: axes.Axes, random_time=False, time_start=None, time_end=None, title=None):
     """
     Create a raster plot of the units from .mat file
 
@@ -69,8 +70,12 @@ def main():
     mat_tj = MatExtractor(path_mat_tj)
     mat_mx = MatExtractor(path_mat_mx)
 
-    fig, axs = plt.subplots(1)
-    raster_plot(mat_mx, axs, random_time=True)
+    mat_tj = MatExtractor("/Users/maxlim/KosikLab/scripts/good_experiment1_baseline_sorted.mat")
+    mat_mx = MatExtractor("/Users/maxlim/KosikLab/scripts/experiment1_baseline_sorted.mat")
+
+    fig, axs = plt.subplots(2)
+    raster_plot(mat_tj, axs[0], time_start=1000, time_end=100000)
+    raster_plot(mat_mx, axs[1], random_time=False, time_start=1000, time_end=100000)
 
     plt.show()
 
