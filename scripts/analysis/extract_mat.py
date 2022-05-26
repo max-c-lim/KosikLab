@@ -2,7 +2,6 @@
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import OrderedDict
 
 
 class MatExtractor:
@@ -119,7 +118,6 @@ class Unit:
             # In general, there should be more channels than time points
             # Transpose template to ensure (n_timepoints, n_channels)
             template = template.transpose((1, 0))
-        print(template.shape)
         return template
 
     def get_id(self):
@@ -137,22 +135,6 @@ class Unit:
         templates = self.get_template()
         max_channel = templates.min(axis=0).argmin()
         return templates[:, max_channel]
-
-    def plot_templates(self, plot_all=True):
-        """
-        Plots templates
-        """
-        template = self.get_template()
-
-        if plot_all:
-            plt.plot(template)
-            plt.title(f"Unit ID: {self.get_id()}")
-            plt.show()
-        else:
-            for channel_ind in range(template.shape[1]):
-                plt.plot(template[:, channel_ind])
-                plt.title(f"Unit ID: {self.get_id()}  |  Channel: {channel_ind}")
-                plt.show()
 
 
 def find_similar_units(mat_extractor1, mat_extractor2):
@@ -184,14 +166,6 @@ def main():
     # MatExtractors
     mat_tj = MatExtractor(path_mat_tj)
     mat_mx = MatExtractor(path_mat_mx)
-
-    similar_units = [(17, 14), (28, 26)]  # (TJ_unit_id, MX_unit_id)
-
-    for tj_id, mx_id in similar_units:
-        fig, (sub1, sub2) = plt.subplots(2)
-        sub1.plot(mat_tj.get_unit(tj_id).get_template_max())
-        sub2.plot(mat_mx.get_unit(mx_id).get_template_max())
-        plt.show()
 
 
 if __name__ == "__main__":

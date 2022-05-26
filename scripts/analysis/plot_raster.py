@@ -12,14 +12,14 @@ def compare_raster_plots(recording, mat_tj, mat_mx, time_start=120000, time_end=
     fig.supylabel("Units")
     fig.canvas.manager.set_window_title(f"{recording}_raster_plots")
 
-    mat_tj.raster_plot(title=f"TJ's sorting. N Units: {len(mat_tj.get_units())}", time_start=time_start,
+    mat_tj.plot_raster(title=f"TJ's sorting. N Units: {len(mat_tj.get_units())}", time_start=time_start,
                        time_end=time_end, subplot=axs[0])
-    mat_mx.raster_plot(title=f"Max's sorting. N Units: {len(mat_mx.get_units())}", time_start=time_start,
+    mat_mx.plot_raster(title=f"Max's sorting. N Units: {len(mat_mx.get_units())}", time_start=time_start,
                        time_end=time_end, subplot=axs[1])
     plt.show()
 
 
-def raster_plot(mat, subplot: axes.Axes, random_time=False, time_start=None, time_end=None, title=None):
+def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, time_end=None, title=None):
     """
     Create a raster plot of the units from .mat file
 
@@ -73,10 +73,8 @@ def main():
     mat_tj = MatExtractor("/Users/maxlim/KosikLab/scripts/good_experiment1_baseline_sorted.mat")
     mat_mx = MatExtractor("/Users/maxlim/KosikLab/scripts/experiment1_baseline_sorted.mat")
 
-    fig, axs = plt.subplots(2)
-    raster_plot(mat_tj, axs[0], time_start=1000, time_end=100000)
-    raster_plot(mat_mx, axs[1], random_time=False, time_start=1000, time_end=100000)
-
+    fig, axs = plt.subplots(1)
+    plot_raster(MatExtractor("/Users/maxlim/KosikLab/scripts/0uM_sorted.mat"), axs, time_start=1000, time_end=100000)
     plt.show()
 
 

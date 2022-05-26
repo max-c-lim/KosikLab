@@ -57,7 +57,8 @@ def main():
     # mat_mx = MatExtractor(data_path + f"mx/{rec_num}_sorted.mat")
     mat_tj = MatExtractor("/Users/maxlim/KosikLab/scripts/good_experiment1_baseline_sorted.mat")
     mat_mx = MatExtractor("/Users/maxlim/KosikLab/scripts/experiment1_baseline_sorted.mat")
-
+    mat_mx = MatExtractor("/Users/maxlim/KosikLab/scripts/0uM_sorted.mat")
+    mat_tj = mat_mx
     # Plotting Electrodes
     size_scale = 1
     electrode_data_tj = get_electrode_data(mat_tj, size_scale=size_scale)

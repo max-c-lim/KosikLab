@@ -1,4 +1,5 @@
 # TESTING ON 2950 CONTROL RECORDING (0uM)
+# Test how different parallel processing parameters affects .dat file after bandpass filter
 
 import time
 
@@ -75,7 +76,7 @@ stopwatch = Stopwatch()
 size = traces_g6.size
 chunk_size = 45955
 print(np.all(np.isclose(traces_g4[:chunk_size], traces_g6[:chunk_size])))
-# Todo: Look at traces near the end of the chunk
+# Todo: Look at traces near the end of the chunk. Traces seem to be identical in beginning but different at chunk border
 """
 When using 64 jobs...
 total_memory = 4G: 30637 chunk_size, 118 chunks, 36s total, 3.22it/s

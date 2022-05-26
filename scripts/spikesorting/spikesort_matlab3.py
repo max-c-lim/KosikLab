@@ -15,7 +15,8 @@ recording_files = [
 ]
 # List of intermediate folders where Kilosort2 files and waveforms are saved
 intermediate_folders = [
-    "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1",
+    # "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1b",
+    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950"
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
@@ -26,7 +27,8 @@ intermediate_folders = [
 # List of output folders where final matlab files are saved.
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 matlab_folders = [
-    "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1",
+    # "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1b",
+    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950"
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
     # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
@@ -72,7 +74,7 @@ kilosort_params = {
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
 recompute_recording = True  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
 recompute_sorting = True
-recompute_waveforms = False
+recompute_waveforms = True
 recompute_curation = True
 
 # Override matlab file if it exists
@@ -81,10 +83,11 @@ override_matlab = True
 ######################################################
 #########  PARALLEL PROCESSING PARAMETERS  ###########
 ######################################################
+# n_jobs and total_memory affects how bandpass filter is applied to raw recording, causing different .dat file
 # Number of jobs to use for converting raw recording, extracting waveforms, and curation
 n_jobs = 64
-# Total RAM to use for converting raw recording, extracting waveforms, and curation (more memory-> faster)
-total_memory = "16G"  # Setting to another value may cause bug when converting .raw.h5 to .dat
+# Total RAM to use for converting raw recording, extracting waveforms, and curation
+total_memory = "1G"  # Setting to another value may cause bug when converting .raw.h5 to .dat
 
 ######################################################
 ############  BANDPASS FILTER PARAMETERS  ############
@@ -122,7 +125,7 @@ auto_curate = True
 fr_thresh = 0.05
 # ISI-violation ratio (greater values are removed)
 # Ratio of violation_rate / total_spike_rate
-isi_viol_thresh = 0.3
+isi_viol_thresh = 0.5
 # signal-to-noise ratio (smaller values are removed)
 snr_thresh = 5
 
@@ -1395,6 +1398,9 @@ class WaveformExtractor:
         """
         # TODO : run this in parralel
 
+        print_stage("PRECOMPUTING TEMPLATES")
+        print("Template modes: " + ", ".join(modes))
+        stopwatch = Stopwatch()
         unit_ids = self.sorting.unit_ids
         num_chans = self.recording.get_num_channels()
 
@@ -1416,10 +1422,12 @@ class WaveformExtractor:
 
                 self._template_cache[mode][i, :, :] = arr
 
+        print("Saving templates to .npy")
         for mode in modes:
             templates = self._template_cache[mode]
             template_file = self.folder / f'templates_{mode}.npy'
             np.save(template_file, templates)
+        stopwatch.log_time("Total")
 
     def select_units(self, unit_ids, new_folder):
         """
@@ -2941,15 +2949,15 @@ def extract_waveforms(recording, sorting, folder,
     if not recompute_waveforms and (folder/"waveforms").is_dir():  # Load saved waveform extractor
         print("Loading waveforms from folder")
         we = WaveformExtractor.load_from_folder(recording, sorting, folder)
+        stopwatch.log_time("Done extracting waveforms.")
     else:  # Create new waveform extractor
         print("Computing new waveforms")
         create_folder(folder)
         we = WaveformExtractor.create(recording, sorting, folder)
         we.run_extract_waveforms(**job_kwargs)
-
+        stopwatch.log_time("Done extracting waveforms.")
         if precompute_template is not None:
             we.precompute_templates(modes=precompute_template)
-    stopwatch.log_time("Done extracting waveforms.")
     return we
 
 
