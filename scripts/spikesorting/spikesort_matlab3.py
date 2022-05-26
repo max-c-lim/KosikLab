@@ -6,34 +6,31 @@
 # If path is a folder with multiple recording files,
 # they will be concatenated in natural ordering.
 recording_files = [
-    # "/home/maxlim/SpikeSorting/data/wetai-gym/maxwell/tetanus/recordings/experiment1_baseline.raw.h5",
-    "/home/maxlim/SpikeSorting/data/maxone/200123/2950/recordings/0uM.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/maxone/200123/2954/network/10h36m24s.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/maxone/200123/2957/network/11h24m49s.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/maxone/200520/5116/network/11h54m18s.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/maxone/200520/5118/network/12h09m06s.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2950.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2953.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2954.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2957.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_5116.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_5118.raw.h5"
 ]
 # List of intermediate folders where Kilosort2 files and waveforms are saved
 intermediate_folders = [
-    # "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1b",
-    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950"
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/5116",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/5118",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2950",
+    "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2953",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2954",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2957",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_5116",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_5118"
 ]
 
 # List of output folders where final matlab files are saved.
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 matlab_folders = [
-    # "/home/maxlim/SpikeSorting/wetai-gym/maxwell/tetanus/sanity_check/experiment1b",
-    "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2950"
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2953",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2954",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/2957",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/5116",
-    # "/home/maxlim/SpikeSorting/data/maxone/bandpass_filter/5118",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted",
+      "/home/maxlim/SpikeSorting/data/DL/sorted",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted"
 ]
 
 assert len(recording_files) == len(intermediate_folders) == len(matlab_folders), "'recording_files'" \
@@ -72,7 +69,7 @@ kilosort_params = {
 
 # If True and exists, its entire parent folder is deleted and recomputed
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
-recompute_recording = True  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
+recompute_recording = False  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
 recompute_sorting = True
 recompute_waveforms = True
 recompute_curation = True
@@ -100,9 +97,9 @@ freq_max = 6000
 ###############  WAVEFORM PARAMETERS  ################
 ######################################################
 # ms before waveform trough to include
-ms_before = 5.
+ms_before = 3.
 # ms after waveform trough to include
-ms_after = 5.
+ms_after = 4.
 # If True and recording has gain_to_uV/offset_to_uV properties, waveforms are converted to uV
 return_scaled = True
 # Number of spikes per unit to compute templates (None-> all spikes are used)
@@ -125,7 +122,7 @@ auto_curate = True
 fr_thresh = 0.05
 # ISI-violation ratio (greater values are removed)
 # Ratio of violation_rate / total_spike_rate
-isi_viol_thresh = 0.5
+isi_viol_thresh = 0.3
 # signal-to-noise ratio (smaller values are removed)
 snr_thresh = 5
 
