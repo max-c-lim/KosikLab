@@ -27,7 +27,7 @@ intermediate_folders = [
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 matlab_folders = [
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
-      "/home/maxlim/SpikeSorting/data/DL/sorted",
+    "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted"
@@ -70,8 +70,8 @@ kilosort_params = {
 # If True and exists, its entire parent folder is deleted and recomputed
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
 recompute_recording = False  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
-recompute_sorting = True
-recompute_waveforms = True
+recompute_sorting = False
+recompute_waveforms = False
 recompute_curation = True
 
 # Override matlab file if it exists
@@ -122,7 +122,7 @@ auto_curate = True
 fr_thresh = 0.05
 # ISI-violation ratio (greater values are removed)
 # Ratio of violation_rate / total_spike_rate
-isi_viol_thresh = 0.3
+isi_viol_thresh = 0.5
 # signal-to-noise ratio (smaller values are removed)
 snr_thresh = 5
 
@@ -1286,51 +1286,6 @@ class WaveformExtractor:
     # endregion
 
     # region Get waveforms and templates
-    def get_template(self, unit_id, mode='average', sparsity=None):
-        """
-        Return template (average waveform).
-
-        Parameters
-        ----------
-        unit_id: int or str
-            Unit id to retrieve waveforms for
-        mode: str
-            'average' (default), 'median' , 'std'(standard deviation)
-        sparsity: dict or None
-            If given, dictionary with unit ids as keys and channel sparsity by index as values.
-            The sparsity can be computed with the toolkit.get_template_channel_sparsity() function
-            (make sure to use the default output='id' when computing the sparsity)
-
-        Returns
-        -------
-        template: np.array
-            The returned template (num_samples, num_channels)
-        """
-
-        _possible_template_modes = ('average', 'std', 'median')
-        assert mode in _possible_template_modes
-        assert unit_id in self.sorting.unit_ids
-
-        if mode in self._template_cache:
-            # already in the global cache
-            templates = self._template_cache[mode]
-            unit_ind = self.sorting.id_to_index(unit_id)
-            template = templates[unit_ind, :, :]
-            if sparsity is not None:
-                chan_inds = self.recording.ids_to_indices(sparsity[unit_id])
-                template = template[:, chan_inds]
-            return template
-
-        # compute from waveforms
-        wfs = self.get_waveforms(unit_id, sparsity=sparsity)
-        if mode == 'median':
-            template = np.median(wfs, axis=0)
-        elif mode == 'average':
-            template = np.average(wfs, axis=0)
-        elif mode == 'std':
-            template = np.std(wfs, axis=0)
-        return template
-
     def get_waveforms(self, unit_id, with_index=False, cache=True, memmap=True, sparsity=None):
         """
         Return waveforms for the specified unit id.
@@ -1383,6 +1338,51 @@ class WaveformExtractor:
         else:
             return wfs
 
+    def get_template(self, unit_id, mode='average', sparsity=None):
+        """
+        Return template (average waveform).
+
+        Parameters
+        ----------
+        unit_id: int or str
+            Unit id to retrieve waveforms for
+        mode: str
+            'average' (default), 'median' , 'std'(standard deviation)
+        sparsity: dict or None
+            If given, dictionary with unit ids as keys and channel sparsity by index as values.
+            The sparsity can be computed with the toolkit.get_template_channel_sparsity() function
+            (make sure to use the default output='id' when computing the sparsity)
+
+        Returns
+        -------
+        template: np.array
+            The returned template (num_samples, num_channels)
+        """
+
+        _possible_template_modes = ('average', 'std', 'median')
+        assert mode in _possible_template_modes
+        assert unit_id in self.sorting.unit_ids
+
+        if mode in self._template_cache:
+            # already in the global cache
+            templates = self._template_cache[mode]
+            unit_ind = self.sorting.id_to_index(unit_id)
+            template = templates[unit_ind, :, :]
+            if sparsity is not None:
+                chan_inds = self.recording.ids_to_indices(sparsity[unit_id])
+                template = template[:, chan_inds]
+            return template
+
+        # compute from waveforms
+        wfs = self.get_waveforms(unit_id, sparsity=sparsity)
+        if mode == 'median':
+            template = np.median(wfs, axis=0)
+        elif mode == 'average':
+            template = np.average(wfs, axis=0)
+        elif mode == 'std':
+            template = np.std(wfs, axis=0)
+        return template
+
     def precompute_templates(self, modes=('average', 'std')):
         """
         Precompute all template for different "modes":
@@ -1425,6 +1425,63 @@ class WaveformExtractor:
             template_file = self.folder / f'templates_{mode}.npy'
             np.save(template_file, templates)
         stopwatch.log_time("Total")
+
+    def get_template_amplitudes(self, peak_sign='neg'):
+        """
+        Get amplitude per channel for each unit.
+
+        Parameters
+        ----------
+        peak_sign: str
+            Sign of the template to compute best channels ('neg', 'pos', 'both')
+
+        Returns
+        -------
+        peak_values: dict
+            Dictionary with unit ids as keys and template amplitudes as values
+        """
+        assert peak_sign in ('both', 'neg', 'pos')
+
+        peak_values = {}
+        for unit_id in self.sorting.unit_ids:
+            template = self.get_template(unit_id, mode='average')
+
+            if peak_sign == 'both':
+                values = np.max(np.abs(template), axis=0)
+            elif peak_sign == 'neg':
+                values = -np.min(template, axis=0)
+            elif peak_sign == 'pos':
+                values = np.max(template, axis=0)
+
+            peak_values[unit_id] = np.abs(values)
+        return peak_values
+
+    def get_template_extremums(self, peak_sign='neg'):
+        """
+        Compute the amplitude and the channel with the extremum peak for each unit in self.sorting.unit_ids.
+
+        Parameters
+        ----------
+        peak_sign: str
+            Sign of the template to compute best channels ('neg', 'pos', 'both')
+
+        Returns
+        -------
+        extremum_amplitudes: dict
+            Dictionary with unit_ids as keys and amplitudes as values
+        extremum_channels_indices: dict
+            Dictionary with unit ids as keys and extremum channels (indices) as values
+        """
+
+        amplitudes = self.get_template_amplitudes(peak_sign=peak_sign)
+        extremum_amplitudes = {}
+        extremum_channels_indices = {}
+        for unit_id in self.sorting.unit_ids:
+            unit_amplitudes = amplitudes[unit_id]
+            extremum_amplitudes[unit_id] = np.max(unit_amplitudes)
+            extremum_channels_indices[unit_id] = np.argmax(unit_amplitudes)
+
+        return extremum_amplitudes, extremum_channels_indices
 
     def select_units(self, unit_ids, new_folder):
         """
@@ -2356,7 +2413,36 @@ atexit.register(_python_exit)
 # region Curation
 class CurationMetrics:
     @staticmethod
-    def compute_isi_violations(waveform_extractor, isi_threshold_ms=1.5, min_isi_ms=0, **kwargs):
+    def curate_firing_rate(recording, sorting):
+        """
+        Curate units in sorting.unit_ids based on firing rate
+        Units with firing rate greater than fr_thresh are curated
+
+        Parameters
+        ----------
+        recording
+            Must have recording.get_num_samples() and recording.get_sampling_frequency()
+        sorting
+            Must have sorting.unit_ids and sorting.get_unit_spike_train(unit_id=)
+
+        Returns
+        -------
+        Curated units as np.array
+        """
+        print_stage("CURATING FIRING RATE")
+        stopwatch = Stopwatch()
+        total_duration = recording.get_num_samples() / recording.get_sampling_frequency()
+        curated_unit_ids = []
+        for unit_id in sorting.unit_ids:
+            firing_rate = sorting.get_unit_spike_train(unit_id=unit_id).size / total_duration
+            if firing_rate >= fr_thresh:
+                curated_unit_ids.append(unit_id)
+        print(f'N units after firing rate curation: {len(curated_unit_ids)}')
+        stopwatch.log_time()
+        return np.asarray(curated_unit_ids)
+
+    @staticmethod
+    def curate_isi_violation(recording, sorting, isi_threshold_ms=1.5, min_isi_ms=0):
         """
         Calculate Inter-Spike Interval (ISI) violations for a spike train.
 
@@ -2370,8 +2456,10 @@ class CurationMetrics:
 
         Parameters
         ----------
-        waveform_extractor : WaveformExtractor
-            The waveforme xtractor object
+        recording
+            Must have recording.get_num_samples() and recording.get_sampling_frequency()
+        sorting
+            Must have sorting.unit_ids and sorting.get_unit_spike_train(unit_id=)
         isi_threshold_ms : float
             Threshold for classifying adjacent spikes as an ISI violation. This is the biophysical refractory period
             (default=1.5)
@@ -2381,289 +2469,140 @@ class CurationMetrics:
 
         Returns
         -------
+        Curated units as np.array
+
+        Notes
+        -----
         isi_violations_ratio : float
-            The isi violation ratio described in [1]
+            The isi violation ratio described in [1] (violations_rate / total_rate)
         isi_violations_rate : float
             Rate of contaminating spikes as a fraction of overall rate. Higher values indicate more contamination
         isi_violation_count : int
             Number of violations
-
-        Notes
         -----
-        You can interpret an ISI violations ratio value of 0.5 as meaning that contamining spikes are occurring at roughly
+        You can interpret an ISI violations ratio value of 0.5 as meaning that contaminating spikes are occurring at roughly
         half the rate of "true" spikes for that unit. In cases of highly contaminated units, the ISI violations value can
         sometimes be even greater than 1.
 
         Originally written in Matlab by Nick Steinmetz (https://github.com/cortex-lab/sortingQuality) and
         converted to Python by Daniel Denman.
         """
-        recording = waveform_extractor.recording
-        sorting = waveform_extractor.sorting
-        unit_ids = sorting.unit_ids
-        num_segs = sorting.get_num_segments()
-        fs = recording.get_sampling_frequency()
+        print_stage("CURATING ISI VIOLATION")
+        stopwatch = Stopwatch()
+        sampling_frequency = recording.get_sampling_frequency()
+        total_duration = recording.get_num_samples() / sampling_frequency
 
-        seg_durations = [recording.get_num_samples(i) / fs for i in range(num_segs)]
-        total_duration = np.sum(seg_durations)
-
+        # All units converted to seconds
         isi_threshold_s = isi_threshold_ms / 1000
         min_isi_s = min_isi_ms / 1000
-        isi_threshold_samples = int(isi_threshold_s * fs)
+        isi_threshold_samples = int(isi_threshold_s * sampling_frequency)
 
-        isi_violations_rate = {}
-        isi_violations_count = {}
-        isi_violations_ratio = {}
+        curated_unit_ids = []
+        for unit_id in sorting.unit_ids:
+            spike_train = sorting.get_unit_spike_train(unit_id=unit_id)
+            num_spikes = spike_train.size
+            isis = np.diff(spike_train)
 
-        # all units converted to seconds
-        for unit_id in unit_ids:
-            num_violations = 0
-            num_spikes = 0
-            for segment_index in range(num_segs):
-                spike_train = sorting.get_unit_spike_train(unit_id=unit_id, segment_index=segment_index)
-                isis = np.diff(spike_train)
-                num_spikes += len(spike_train)
-                num_violations += np.sum(isis < isi_threshold_samples)
+            violation_num = np.sum(isis < isi_threshold_samples)
             violation_time = 2 * num_spikes * (isi_threshold_s - min_isi_s)
+
             total_rate = num_spikes / total_duration
-            violation_rate = num_violations / violation_time
+            violation_rate = violation_num / violation_time
+            violation_rate_ratio = violation_rate / total_rate
 
-            isi_violations_ratio[unit_id] = violation_rate / total_rate
-            isi_violations_rate[unit_id] = num_violations / total_duration
-            isi_violations_count[unit_id] = num_violations
-
-        res = namedtuple('isi_violaion', ['isi_violations_ratio', 'isi_violations_rate', 'isi_violations_count'])
-        return res(isi_violations_ratio, isi_violations_rate, isi_violations_count)
-
-    @staticmethod
-    def compute_firing_rate(waveform_extractor, **kwargs):
-        """
-        Compute firing rate across segments.
-        """
-        recording = waveform_extractor.recording
-        sorting = waveform_extractor.sorting
-        unit_ids = sorting.unit_ids
-        num_segs = sorting.get_num_segments()
-        fs = recording.get_sampling_frequency()
-
-        seg_durations = [recording.get_num_samples(i) / fs for i in range(num_segs)]
-        total_duraion = np.sum(seg_durations)
-
-        firing_rates = {}
-        for unit_id in unit_ids:
-            n = 0
-            for segment_index in range(num_segs):
-                st = sorting.get_unit_spike_train(unit_id=unit_id, segment_index=segment_index)
-                n += st.size
-
-            firing_rates[unit_id] = n / total_duraion
-
-        return firing_rates
+            if violation_rate_ratio <= isi_viol_thresh:
+                curated_unit_ids.append(unit_id)
+        print(f'N units after ISI violation curation: {len(curated_unit_ids)}')
+        stopwatch.log_time()
+        return np.asarray(curated_unit_ids)
 
     @staticmethod
-    def compute_snrs(waveform_extractor, peak_sign='neg', **kwargs):
+    def curate_snr(waveform_extractor, peak_sign='neg'):
         """
-        Compute signal to noise ratio.
+        Parameters
+        ----------
+        waveform_extractor: WaveformExtractor
+        peak_sign: Union('neg', 'pos', 'both')
+            Sign of the units' templates to compute best channel
+
+        Returns
+        -------
+        Curated units as np.array
         """
+        print_stage("CURATING SIGNAL-TO-NOISE RATIO")
+        stopwatch = Stopwatch()
         recording = waveform_extractor.recording
         sorting = waveform_extractor.sorting
-        unit_ids = sorting.unit_ids
-        channel_ids = recording.channel_ids
 
-        extremum_channels_ids = CurationMetrics.get_template_extremum_channel(waveform_extractor, peak_sign=peak_sign)
-        unit_amplitudes = CurationMetrics.get_template_extremum_amplitude(waveform_extractor, peak_sign=peak_sign)
-        return_scaled = waveform_extractor.return_scaled
-        noise_levels = CurationMetrics.get_noise_levels(recording, return_scaled=return_scaled, **kwargs)
-
-        # make a dict to acces by chan_id
-        noise_levels = dict(zip(channel_ids, noise_levels))
-
-        snrs = {}
-        for unit_id in unit_ids:
-            chan_id = extremum_channels_ids[unit_id]
-            noise = noise_levels[chan_id]
-            amplitude = unit_amplitudes[unit_id]
+        extremum_amplitudes, extremum_channels_indices = waveform_extractor.get_template_extremums(peak_sign=peak_sign)
+        noise_levels = CurationMetrics.get_noise_levels(recording, waveform_extractor.return_scaled)
+        curated_unit_ids = []
+        for unit_id in sorting.unit_ids:
+            chan_ind = extremum_channels_indices[unit_id]
+            amplitude = extremum_amplitudes[unit_id]
+            noise = noise_levels[chan_ind]
             with np.errstate(divide='ignore'):  # Ignore divide by zero warnings
-                snrs[unit_id] = np.abs(amplitude) / noise
+                if amplitude / noise >= snr_thresh:
+                    curated_unit_ids.append(unit_id)
 
-        return snrs
-
-    # region Functions needed for compute_snrs and converting to matlab
-    @staticmethod
-    def get_template_extremum_channel(waveform_extractor, peak_sign='neg', outputs='id'):
-        """
-        Compute the channel with the extremum peak for each unit.
-
-        Parameters
-        ----------
-        waveform_extractor: WaveformExtractor
-            The waveform extractor
-        peak_sign: str
-            Sign of the template to compute best channels ('neg', 'pos', 'both')
-        outputs: str
-            * 'id': channel id
-            * 'index': channel index
-
-        Returns
-        -------
-        extremum_channels: dict
-            Dictionary with unit ids as keys and extremum channels (id or index based on 'outputs')
-            as values
-        """
-
-        # region Functions needed
-        def get_template_amplitudes(waveform_extractor, peak_sign='neg', mode='extremum'):
-            """
-            Get amplitude per channel for each unit.
-
-            Parameters
-            ----------
-            waveform_extractor: WaveformExtractor
-                The waveform extractor
-            peak_sign: str
-                Sign of the template to compute best channels ('neg', 'pos', 'both')
-            mode: str
-                'extremum':  max or min
-                'at_index': take value at spike index
-
-            Returns
-            -------
-            peak_values: dict
-                Dictionary with unit ids as keys and template amplitudes as values
-            """
-            assert peak_sign in ('both', 'neg', 'pos')
-            assert mode in ('extremum', 'at_index')
-            unit_ids = waveform_extractor.sorting.unit_ids
-
-            before = waveform_extractor.nbefore
-
-            peak_values = {}
-
-            for unit_id in unit_ids:
-                template = waveform_extractor.get_template(unit_id, mode='average')
-
-                if mode == 'extremum':
-                    if peak_sign == 'both':
-                        values = np.max(np.abs(template), axis=0)
-                    elif peak_sign == 'neg':
-                        values = -np.min(template, axis=0)
-                    elif peak_sign == 'pos':
-                        values = np.max(template, axis=0)
-                elif mode == 'at_index':
-                    if peak_sign == 'both':
-                        values = np.abs(template[before, :])
-                    elif peak_sign == 'neg':
-                        values = -template[before, :]
-                    elif peak_sign == 'pos':
-                        values = template[before, :]
-
-                peak_values[unit_id] = values
-
-            return peak_values
-
-        # endregion
-
-        unit_ids = waveform_extractor.sorting.unit_ids
-        channel_ids = waveform_extractor.recording.channel_ids
-
-        peak_values = get_template_amplitudes(waveform_extractor, peak_sign=peak_sign)
-        extremum_channels_id = {}
-        extremum_channels_index = {}
-        for unit_id in unit_ids:
-            max_ind = np.argmax(peak_values[unit_id])
-            extremum_channels_id[unit_id] = channel_ids[max_ind]
-            extremum_channels_index[unit_id] = max_ind
-
-        if outputs == 'id':
-            return extremum_channels_id
-        elif outputs == 'index':
-            return extremum_channels_index
-
-    @staticmethod
-    def get_template_extremum_amplitude(waveform_extractor, peak_sign='neg'):
-        """
-        Computes amplitudes on the best channel.
-
-        Parameters
-        ----------
-        waveform_extractor: WaveformExtractor
-            The waveform extractor
-        peak_sign: str
-            Sign of the template to compute best channels ('neg', 'pos', 'both')
-
-        Returns
-        -------
-        amplitudes: dict
-            Dictionary with unit ids as keys and amplitudes as values
-        """
-        unit_ids = waveform_extractor.sorting.unit_ids
-
-        before = waveform_extractor.nbefore
-
-        extremum_channels_ids = CurationMetrics.get_template_extremum_channel(waveform_extractor, peak_sign=peak_sign)
-
-        unit_amplitudes = {}
-        for unit_id in unit_ids:
-            template = waveform_extractor.get_template(unit_id, mode='average')
-            chan_id = extremum_channels_ids[unit_id]
-            chan_ind = waveform_extractor.recording.id_to_index(chan_id)
-            unit_amplitudes[unit_id] = template[before, chan_ind]
-
-        return unit_amplitudes
+        print(f"N units after SNR curation: {len(curated_unit_ids)}")
+        stopwatch.log_time()
+        return np.asarray(curated_unit_ids)
 
     @staticmethod
     def get_noise_levels(recording, return_scaled=True, **random_chunk_kwargs):
         """
         Estimate noise for each channel using MAD methods.
 
-        Internally it sample some chunk across segment.
-        And then, it use MAD estimator (more robust than STD)
-
+        Internally, it samples some chunk across segment.
+        And then, it uses MAD estimator (more robust than STD)
         """
+        stopwatch = Stopwatch()
+        print("Getting noise levels per channel")
 
-        # region Functions needed
-        def get_random_data_chunks(recording, return_scaled=False, num_chunks_per_segment=20, chunk_size=10000, seed=0):
-            """
-            Exctract random chunks across segments
-
-            This is used for instance in get_noise_levels() to estimate noise on traces.
-
-            Parameters
-            ----------
-            recording: BaseRecording
-                The recording to get random chunks from
-            return_scaled: bool
-                If True, returned chunks are scaled to uV
-            num_chunks_per_segment: int
-                Number of chunks per segment
-            chunk_size: int
-                Size of a chunk in number of frames
-            seed: int
-                Random seed
-
-            Returns
-            -------
-            chunk_list: np.array
-                Array of concatenate chunks per segment
-            """
-
-            chunk_list = []
-            for segment_index in range(recording.get_num_segments()):
-                length = recording.get_num_frames(segment_index)
-                random_starts = np.random.RandomState(seed=seed).randint(0,
-                                                                         length - chunk_size, size=num_chunks_per_segment)
-                for start_frame in random_starts:
-                    chunk = recording.get_traces(start_frame=start_frame,
-                                                 end_frame=start_frame + chunk_size,
-                                                 segment_index=segment_index,
-                                                 return_scaled=return_scaled)
-                    chunk_list.append(chunk)
-            return np.concatenate(chunk_list, axis=0)
-
-        # endregion
-        random_chunks = get_random_data_chunks(recording, return_scaled=return_scaled, **random_chunk_kwargs)
+        random_chunks = CurationMetrics.get_random_data_chunks(recording, return_scaled=return_scaled,
+                                                               **random_chunk_kwargs)
         med = np.median(random_chunks, axis=0, keepdims=True)
         noise_levels = np.median(np.abs(random_chunks - med), axis=0) / 0.6745
+        stopwatch.log_time("Done getting noise levels.")
         return noise_levels
+
+    @staticmethod
+    def get_random_data_chunks(recording, return_scaled=False, num_chunks=20, chunk_size=10000, seed=0):
+        """
+        Extract random chunks from recording
+
+        This is used in get_noise_levels() to estimate noise on traces.
+
+        Parameters
+        ----------
+        recording: BaseRecording
+            The recording to get random chunks from
+        return_scaled: bool
+            If True, returned chunks are scaled to uV
+        num_chunks: int
+            Number of chunks
+        chunk_size: int
+            Size of a chunk in number of frames
+        seed: int
+            Random seed
+
+        Returns
+        -------
+        chunk_list: np.array
+            Array of chunks
+        """
+
+        length = recording.get_num_samples()
+        random_state = np.random.RandomState(seed=seed)
+        random_starts = random_state.randint(0, length - chunk_size, size=num_chunks)
+        chunks = []
+        for start_frame in random_starts:
+            chunk = recording.get_traces(start_frame=start_frame,
+                                         end_frame=start_frame + chunk_size,
+                                         return_scaled=return_scaled)
+            chunks.append(chunk)
+        return np.concatenate(chunks, axis=0)
 # endregion
 
 
@@ -2818,7 +2757,6 @@ def load_recording(rec_path):
 
         assert rec.get_num_segments() == 1, "Recording has multiple segments. Divide recording into multiple recordings"
         stopwatch.log_time("Done loading recording.")
-
         return rec
     except Exception as e:
         print(f"Could not open the provided file: {rec_path} with the MaxwellRecordingExtractor because of {e}")
@@ -2958,69 +2896,43 @@ def extract_waveforms(recording, sorting, folder,
     return we
 
 
-def curate_units(rec_cache, sorting, we_raw, curated_folder):
+def curate_units(recording, sorting, we_raw, curated_folder):
 
+    print_stage("CURATING UNITS")
+    stopwatch = Stopwatch()
     if not recompute_curation and (curated_folder/'waveforms').exists():
-        stopwatch = Stopwatch()
-        print_stage("CURATING UNITS")
         print("Skipping data curation since already curated.")
         print("Loading saved curated data.")
-        we_curated = WaveformExtractor.load_from_folder(rec_cache, sorting, curated_folder)
-        we_curated.set_params()
+        we_curated = WaveformExtractor.load_from_folder(recording, sorting, curated_folder)
         stopwatch.log_time("Done loading.")
         return we_curated
 
     if not auto_curate:
-        print_stage("CURATING UNITS")
         print("'auto_curate' is set to False, so skipping data curation.")
         return we_raw
 
-    # Compute quality metrics to determine which waveforms stay
-    print_stage("COMPUTING CURATION METRICS")
-    stopwatch = Stopwatch()
-    waveforms_curated = we_raw.compute_quality_metrics(metric_names=["firing_rate", "isi_violation", "snr"])
-    stopwatch.log_time("Done computing metrics.")
+    # Perform curation
+    unit_ids_initial = sorting.unit_ids
+    print(f'N units before curation: {len(unit_ids_initial)}')
 
-    print_stage("CURATING UNITS")
-    print(f'N units before curation: {len(sorting.unit_ids)}')
+    # Firing rate curation
+    unit_ids_curated_fr = CurationMetrics.curate_firing_rate(recording, sorting)
+    sorting.unit_ids = unit_ids_curated_fr
 
-    # Curation based on firing rate
-    if fr_thresh is not None:
-        print(f"Curation based on firing rate")
-        fr_query = f"firing_rate > {fr_thresh}"
-        waveforms_curated = waveforms_curated.query(fr_query)
-        print(f'N units after num spikes curation: {len(waveforms_curated)}\n')
+    # Interspike interval curation
+    unit_ids_curated_isi = CurationMetrics.curate_isi_violation(recording, sorting)
+    sorting.unit_ids = unit_ids_curated_isi
 
-    # Curation based on interspike-interval-violation
-    if isi_viol_thresh is not None:
-        if len(waveforms_curated) > 0:
-            print(f"Curation based on isi violation ratio")
-            isi_query = f"isi_violations_rate < {isi_viol_thresh}"
-            waveforms_curated = waveforms_curated.query(isi_query)
-            print(f'N units after ISI curation: {len(waveforms_curated)}\n')
-        else:
-            print("No units remain after curation")
-
-    # Curation based on signal-to-noise ratio
-    if snr_thresh is not None:
-        if len(waveforms_curated) > 0:
-            print(f"Curation based on SNR")
-            snr_query = f"snr > {snr_thresh}"
-            waveforms_curated = waveforms_curated.query(snr_query)
-            print(f'N units after SNR curation: {len(waveforms_curated)}\n')
-        else:
-            print("No units remain after curation")
-
-    # The indices of values to keep
-    keep_unit_ids = waveforms_curated.index.values
+    # Signal-to-noise ratio curation
+    unit_ids_curated_snr = CurationMetrics.curate_snr(we_raw)
+    sorting.unit_ids = unit_ids_curated_snr
 
     # Save only the curated waveforms to a new file
     stopwatch = Stopwatch()
     print_stage("SAVING UNITS")
     print("Saving curated units to new folder")
     print(f"Curated folder: {curated_folder}")
-    create_folder(curated_folder)
-    we_curated = we_raw.select_units(unit_ids=keep_unit_ids, new_folder=curated_folder)
+    we_curated = we_raw.select_units(unit_ids=sorting.unit_ids, new_folder=curated_folder)
     stopwatch.log_time("Done saving units.")
 
     return we_curated
@@ -3084,7 +2996,7 @@ def convert_to_matlab(waveform_extractor, rec_path, matlab_path):
     mdict = {"units": [], "locations": recording.get_channel_locations(), "fs": recording.get_sampling_frequency()}
 
     # Get max channels
-    max_channels = CurationMetrics.get_template_extremum_channel(waveform_extractor)
+    _, extremum_channels = waveform_extractor.get_template_extremums()
 
     # Get channel locations
     locations = recording.get_channel_locations()
@@ -3097,11 +3009,11 @@ def convert_to_matlab(waveform_extractor, rec_path, matlab_path):
 
         unit_dict = {}
 
-        max_channel_idx = recording.id_to_index(max_channels[u])
+        max_channel_ind = extremum_channels[u]
 
         spike_train = sorting.get_unit_spike_train(u)
 
-        max_location = locations[max_channel_idx]
+        max_location = locations[max_channel_ind]
 
         template = waveform_extractor.get_template(u)
 
@@ -3112,7 +3024,7 @@ def convert_to_matlab(waveform_extractor, rec_path, matlab_path):
         unit_dict["unit_id"] = u
 
         if save_electrodes:
-            electrode = electrodes[max_channel_idx]
+            electrode = electrodes[max_channel_ind]
             unit_dict["electrode"] = electrode
 
         mdict["units"].append(unit_dict)
