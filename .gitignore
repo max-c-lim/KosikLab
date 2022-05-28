@@ -8,3 +8,5 @@
 data
 # Contains previous versions
 scripts/spikesorting/previous_versions
+# Ignore test.py
+scripts/analysis/test.py
