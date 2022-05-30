@@ -93,6 +93,8 @@ class Unit:
         self.dict = units_raw[index][0][0]
 
     def get_spike_train(self, time_start=None, time_end=None):
+        # Get the spike times of the unit
+
         spike_train = self.dict["spike_train"][0]
         if time_start is not None:
             indices = np.nonzero(spike_train >= time_start)
@@ -127,29 +129,69 @@ class Unit:
         # Get electrode id (channel id) that is closest to neuron (best waveform)
         return self.dict["electrode"][0][0]
 
+    def get_chan_max(self):
+        """
+        Get the channel with the largest amplitude
+        (amplitude is based on negative peak)
+
+        Returns
+        -------
+        Index of max channel
+        """
+        return self.get_template().min(axis=0).argmin()
+
     def get_template_max(self):
         # Of all the templates (one template for each channel),
         # get the template with the min value at any point (min value for amplitude defined as negative peak)
         # This will correspond to the cleanest template since it will be the template recorded by the closest electrode
 
-        templates = self.get_template()
-        max_channel = templates.min(axis=0).argmin()
-        return templates[:, max_channel]
+        return self.get_template()[:, self.get_chan_max()]
 
 
 def find_similar_units(mat_extractor1, mat_extractor2):
-    for unit1 in mat_extractor1.get_units():
-        train1 = unit1.get_spike_train()
-        for unit2 in mat_extractor2.get_units():
-            train2 = unit2.get_spike_train()
-            if len(train2) > len(train1):
+    """
+    Finds which units in mat_extractor1 correspond to mat_extractor2
+
+    Parameters
+    ----------
+    mat_extractor1: MatExtractor
+    mat_extractor2: MatExtractor
+
+    """
+    similar_total = 0
+    from tqdm import tqdm
+    for unit1 in tqdm(mat_extractor1.get_units()):  # type: Unit
+        st1 = unit1.get_spike_train()
+        electrode1 = unit1.get_electrode()
+        for unit2 in mat_extractor2.get_units():  # type: Unit
+            st2 = unit2.get_spike_train()
+            electrode2 = unit2.get_electrode()
+            if electrode1 != electrode2:
                 continue
 
-            train_tj_truncated = train1[:len(train2)]
-            if np.allclose(train_tj_truncated, train2, rtol=0.01):
-                print(f"{mat_extractor1.name}: Unit ID: {unit1.get_id()}")
-                print(f"{mat_extractor2.name}: Unit ID: {unit2.get_id()}")
-                print()
+            similar = True
+            rtol = 0.00001
+            if st2.size < st1.size:
+                for time in st2:
+                    if not np.any(np.isclose(time, st1, rtol=rtol)):
+                        similar = False
+                        break
+            elif st1.size < st2.size:
+                for time in st1:
+                    if not np.any(np.isclose(time, st2, rtol=rtol)):
+                        similar = False
+                        break
+            else:
+                similar = np.all(np.isclose(st1, st2, rtol=rtol))
+
+            if similar:
+                similar_total += 1
+                print(f"Mat 1: {unit1.get_id()} | Mat 2: {unit2.get_id()}")
+                plt.plot(unit1.get_template_max())
+                plt.plot(unit2.get_template_max())
+                plt.show()
+                break
+    print(similar_total)
 
 
 def main():

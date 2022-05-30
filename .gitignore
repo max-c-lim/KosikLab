@@ -6,7 +6,7 @@
 .idea
 # Contains raw data created by scripts for testing
 data
-# Contains previous versions
-scripts/spikesorting/previous_versions
 # Ignore test.py
 scripts/analysis/test.py
+# Ignore Jupyter Notebook Checkpoints
+.ipynb_checkpoints

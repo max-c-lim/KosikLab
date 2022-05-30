@@ -20,7 +20,7 @@ def plot_template(unit: Unit, subplot: axes.Axes):
 
 
 def main():
-    for unit in MatExtractor("/Users/maxlim/KosikLab/data/maxone/tj/5116_sorted.mat").get_units():
+    for unit in MatExtractor("/Users/maxlim/KosikLab/scripts/tj_data_sorted.mat").get_units():
         fig, (ax0) = plt.subplots(1, sharex="all")  # type: (figure.Figure, axes.Axes)
         plot_template(unit, ax0)
         plt.show()

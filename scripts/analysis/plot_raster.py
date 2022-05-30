@@ -30,7 +30,7 @@ def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, tim
     subplot:
         Subplot to plot raster plot on
     random_time: bool
-        Choose time_start and time_end randomly
+        Choose time_start and time_end randomly. Returns time_start and time_end
     time_start
         Starting time
     time_end
@@ -53,6 +53,9 @@ def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, tim
     subplot.set_xlabel("Time (samples)")
     subplot.set_ylabel("Units")
 
+    if random_time:
+        return time_start, time_end
+
 
 def main():
     # Directory of .mat files
@@ -67,14 +70,13 @@ def main():
     # path_mat_mx = path_mx + f"{rec_num}_sorted.mat"
 
     # MatExtractors
-    mat_tj = MatExtractor(path_mat_tj)
-    mat_mx = MatExtractor(path_mat_mx)
 
-    mat_tj = MatExtractor("/Users/maxlim/KosikLab/scripts/good_experiment1_baseline_sorted.mat")
-    mat_mx = MatExtractor("/Users/maxlim/KosikLab/scripts/experiment1_baseline_sorted.mat")
+    mat_150 = MatExtractor("/Users/maxlim/KosikLab/scripts/analysis/data/maxone/mx/150_maxone_2953_sorted.mat")
+    mat_300 = MatExtractor("/Users/maxlim/KosikLab/scripts/analysis/data/maxone/mx/300_maxone_2953_sorted.mat")
 
-    fig, axs = plt.subplots(1)
-    plot_raster(MatExtractor("/Users/maxlim/KosikLab/scripts/0uM_sorted.mat"), axs, time_start=1000, time_end=100000)
+    fig, (a0, a1) = plt.subplots(2)
+    time_start, time_end = plot_raster(mat_150, a0, random_time=True)
+    plot_raster(mat_300, a1, time_start=time_start, time_end=time_end)
     plt.show()
 
 

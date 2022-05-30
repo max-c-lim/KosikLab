@@ -67,8 +67,8 @@ kilosort_params = {
 # If True and exists, its entire parent folder is deleted and recomputed
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
 recompute_recording = True  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
-recompute_sorting = True
-recompute_waveforms = True
+recompute_sorting = False
+recompute_waveforms = False
 recompute_curation = True
 
 # Override matlab file if it exists
@@ -1508,7 +1508,6 @@ class WaveformExtractor:
         stopwatch = Stopwatch()
 
         print("Saving curated units to new folder")
-        print(f"Curated folder: {curated_folder}")
         create_folder(curated_folder)
 
         # Save unit_ids
@@ -2436,7 +2435,7 @@ class Curation:
         stopwatch = Stopwatch()
         curated_unit_ids = []
         for unit_id in sorting.unit_ids:
-            num_spikes = sorting.get_unit_spike_train(unit_id=unit_id)
+            num_spikes = sorting.get_unit_spike_train(unit_id=unit_id).size
             if num_spikes > min_spikes_per_unit:
                 curated_unit_ids.append(unit_id)
         print(f'N units after minimum spikes per unit curation: {len(curated_unit_ids)}')
@@ -2891,9 +2890,13 @@ def write_recording(recording, recording_dat_path, verbose=True):
 
     print(f"Kilosort2's .dat path: {recording_dat_path}")
     if recompute_recording or not recording_dat_path.exists():
+        # dtype has to be 'int16' (that's what Kilosort2 expects)
+        # BinaryRecordingExtractor.write_recording(recording_filtered, file_paths=recording_dat_path,
+        #                                          dtype='int16', total_memory=total_memory,
+        #                                          n_jobs=n_jobs, verbose=verbose, progress_bar=verbose)
         BinaryRecordingExtractor.write_recording(recording_filtered, file_paths=recording_dat_path,
-                                                 dtype='int16', total_memory=total_memory,
-                                                 n_jobs=n_jobs, verbose=verbose, progress_bar=verbose)
+                                                 dtype='int16', chunk_memory="4G",
+                                                 n_jobs=16, verbose=verbose, progress_bar=verbose)
     else:
         print(f"Skipping writing recording.dat\nUsing existing {recording_dat_path} as recording file")
     stopwatch.log_time("Done writing recording.")
@@ -2955,7 +2958,7 @@ def extract_waveforms(recording, sorting, folder,
         create_folder(folder)
         we = WaveformExtractor.create(recording, sorting, folder)
         we.run_extract_waveforms(**job_kwargs)
-        we.compute_templates(modes=('average'))  # add 'std'?
+        we.compute_templates(modes=('average',))  # add 'std'?
         stopwatch.log_time("Done extracting waveforms.")
     return we
 
@@ -2980,9 +2983,9 @@ def curate_units(recording, sorting, we_raw, curated_folder):
     print(f'N units before curation: {len(unit_ids_initial)}')
 
     # Minimum spikes per unit curation
-    if min_spikes_per_unit is not None:
-        unit_ids_curated_min_spikes = Curation.min_spikes_per_unit(sorting)
-        sorting.unit_ids = unit_ids_curated_min_spikes
+    # if min_spikes_per_unit is not None:
+    #     unit_ids_curated_min_spikes = Curation.min_spikes_per_unit(sorting)
+    #     sorting.unit_ids = unit_ids_curated_min_spikes
 
     # Firing rate curation
     if fr_thresh is not None:
@@ -3033,7 +3036,7 @@ def process_recording(rec_path, inter_path):
     # Curating Data
     waveform_extractor = curate_units(recording_filtered, sorting, we_raw, waveforms_curated_folder)
 
-    stopwatch.log_time("Done processing recording.")
+    stopwatch.log_time("\nDone processing recording.")
 
     return waveform_extractor
 
