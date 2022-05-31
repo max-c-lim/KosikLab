@@ -5,7 +5,7 @@
 # Ignore Pycharm's .idea
 .idea
 # Contains raw data created by scripts for testing
-data
+scripts/analysis/data
 # Ignore test.py
 scripts/analysis/test.py
 # Ignore Jupyter Notebook Checkpoints

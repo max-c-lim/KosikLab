@@ -34,7 +34,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load waveforms
-waveforms = np.load("data/maxone/mx/waveforms_120.npy")
+waveforms = np.load("data/waveforms_216.npy")
 n_spikes, n_samples, n_chans = waveforms.shape
 
 # Get max channel
@@ -67,7 +67,7 @@ def plot_all():
     # Plot waveforms centered on actual negative peak
     a1.set_title("Centered using Calculated Negative Peak")
     a1.set_xlim(0, waveforms_max.shape[1])
-    nbefore = nafter = 16
+    nbefore = nafter = 50
     for wave in waveforms_max:
         peak_ind = get_peak_index(wave)
         wave_recentered = wave[peak_ind - nbefore:peak_ind + nafter]
@@ -93,4 +93,4 @@ def plot_iteratively():
         plt.show()
 
 
-plot_iteratively()
+plot_all()

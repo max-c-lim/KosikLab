@@ -20,6 +20,9 @@ class MatExtractor:
         self.dict = loadmat(path)
         self.units = self.get_units(max_unit_id)
 
+    def get_sampling_frequency(self):
+        return self.dict["fs"].squeeze()
+
     def _get_units_raw(self):
         # Returns array of units in struct form (raw form from scipy)
         return self.dict["units"][0]

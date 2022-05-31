@@ -47,7 +47,7 @@ def get_electrode_data(mat, size_scale=1):
 
 
 def main():
-    plt.rcParams["font.family"] = "Times New Roman"
+    # plt.rcParams["font.family"] = "Times New Roman"
 
     # Directory of .mat files
     data_path = "/Users/maxlim/KosikLab/data/maxone/"
@@ -55,64 +55,89 @@ def main():
     rec_num = 2953
     # mat_tj = MatExtractor(data_path + f"tj/{rec_num}_sorted.mat")
     # mat_mx = MatExtractor(data_path + f"mx/{rec_num}_sorted.mat")
-    mat_tj = MatExtractor("data/maxone/mx/150_maxone_2953_sorted.mat")
-    mat_mx = MatExtractor("data/maxone/mx/300_maxone_2953_sorted.mat")
+    mat_tj = MatExtractor("data/maxone_2953_sorted.mat")
+    mat_mx = MatExtractor("data/maxone_2953_sorted.mat")
 
     # Plotting Electrodes
     size_scale = 1
     electrode_data_tj = get_electrode_data(mat_tj, size_scale=size_scale)
     electrode_data_mx = get_electrode_data(mat_mx, size_scale=size_scale)
 
+    # Single plot
     alpha = 0.7
-    fig, ((ax00, ax01), (ax10, ax11)) = plt.subplots(2, 2)  # type:figure.Figure, ((axes.Axes, axes.Axes), (axes.Axes, axes.Axes))
+    fig, ax = plt.subplots(1)  # type:figure.Figure, axes.Axes
     fig.suptitle(f"Electrode Plots of {rec_num}")
-    fig.supxlabel("x location (μm)")
-    fig.supylabel("y location (μm)")
+    fig.supxlabel("x (μm)")
+    fig.supylabel("y (μm)")
     fig.canvas.manager.set_window_title(f"{rec_num}_electrode_plots")
 
     locations_all = (*electrode_data_tj[0], *electrode_data_tj[1], *electrode_data_mx[0], *electrode_data_mx[1])
     lim_max = max(locations_all)
-    for ax in ((ax00, ax01), (ax10, ax11)):
-        for a in ax:
-            a.set_aspect("equal")
-            a.set_xlim(0, lim_max)
-            a.set_ylim(0, lim_max)
+    ax.set_aspect("equal")
+    buffer = 200
+    ax.set_xlim(-buffer, lim_max+buffer)
+    ax.set_ylim(-buffer, lim_max+buffer)
 
-    ax00.set_title("Comparison")
-    scatter_mx = ax00.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
-    scatter_tj = ax00.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
-    legend_color = ax00.legend((scatter_tj, scatter_mx), ("TJ", "MX"), loc="upper left")
-    for i in range(len(legend_color.legendHandles)):
-        legend_color.legendHandles[i]._sizes = [100]
-
-    loc_off_screen = (-1000, -1000)
-    # size100 = ax00.scatter(*loc_off_screen, size_scale * 100, c="#000000")
-    size1000 = ax00.scatter(*loc_off_screen, size_scale * 1000, c="#000000")
-    # size2000 = ax00.scatter(*loc_off_screen, size_scale * 2000, c="#000000")
-    legend_sizes = ax00.legend((size1000,),
-                               ("1000 units",),
+    loc_off_screen = (-1e8, -1e8)
+    size1000 = ax.scatter(*loc_off_screen, size_scale * 1000, c="#000000")
+    legend_sizes = ax.legend((size1000,),
+                               ("1000 spikes",),
                                loc="upper right")
-
-    ax00.add_artist(legend_color)
-    ax00.add_artist(legend_sizes)
-    scatter_tj = ax10.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
-    scatter_mx = ax10.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
-    ax10.set_title("Comparison")
-    legend = ax10.legend((scatter_tj, scatter_mx),
-               ("TJ", "MX"),
-               loc="upper left")
-    for i in range(len(legend.legendHandles)):
-        legend.legendHandles[i]._sizes = [100]
-
-    ax01.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
-    ax01.set_title("Max's")
-
-    ax11.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
-    ax11.set_title("TJ's")
-
-    spacing = 0.2
-    plt.subplots_adjust(wspace=spacing, hspace=spacing)
+    ax.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha)
     plt.show()
+
+
+    # Comparison
+    # alpha = 0.7
+    # fig, ((ax00, ax01), (ax10, ax11)) = plt.subplots(2, 2)  # type:figure.Figure, ((axes.Axes, axes.Axes), (axes.Axes, axes.Axes))
+    # fig.suptitle(f"Electrode Plots of {rec_num}")
+    # fig.supxlabel("x location (μm)")
+    # fig.supylabel("y location (μm)")
+    # fig.canvas.manager.set_window_title(f"{rec_num}_electrode_plots")
+    #
+    # locations_all = (*electrode_data_tj[0], *electrode_data_tj[1], *electrode_data_mx[0], *electrode_data_mx[1])
+    # lim_max = max(locations_all)
+    # for ax in ((ax00, ax01), (ax10, ax11)):
+    #     for a in ax:
+    #         a.set_aspect("equal")
+    #         a.set_xlim(0, lim_max)
+    #         a.set_ylim(0, lim_max)
+    #
+    # ax00.set_title("Comparison")
+    # scatter_mx = ax00.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
+    # scatter_tj = ax00.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
+    # legend_color = ax00.legend((scatter_tj, scatter_mx), ("TJ", "MX"), loc="upper left")
+    # for i in range(len(legend_color.legendHandles)):
+    #     legend_color.legendHandles[i]._sizes = [100]
+    #
+    # loc_off_screen = (-1000, -1000)
+    # # size100 = ax00.scatter(*loc_off_screen, size_scale * 100, c="#000000")
+    # size1000 = ax00.scatter(*loc_off_screen, size_scale * 1000, c="#000000")
+    # # size2000 = ax00.scatter(*loc_off_screen, size_scale * 2000, c="#000000")
+    # legend_sizes = ax00.legend((size1000,),
+    #                            ("1000 units",),
+    #                            loc="upper right")
+    #
+    # ax00.add_artist(legend_color)
+    # ax00.add_artist(legend_sizes)
+    # scatter_tj = ax10.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
+    # scatter_mx = ax10.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
+    # ax10.set_title("Comparison")
+    # legend = ax10.legend((scatter_tj, scatter_mx),
+    #            ("TJ", "MX"),
+    #            loc="upper left")
+    # for i in range(len(legend.legendHandles)):
+    #     legend.legendHandles[i]._sizes = [100]
+    #
+    # ax01.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha, label="Max")
+    # ax01.set_title("Max's")
+    #
+    # ax11.scatter(*electrode_data_tj, c="#FF0000", alpha=alpha, label="TJ")
+    # ax11.set_title("TJ's")
+    #
+    # spacing = 0.2
+    # plt.subplots_adjust(wspace=spacing, hspace=spacing)
+    # plt.show()
 
 
 if __name__ == "__main__":
