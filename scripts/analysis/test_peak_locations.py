@@ -1,40 +1,8 @@
-# import numpy as np
-# from matplotlib import pyplot as plt
-# from extract_mat import MatExtractor
-# from pathlib import Path
-#
-# indices = {}
-# template_lengths = {}
-# for path in Path("data/maxone/mx").iterdir():
-#     mat = MatExtractor(str(path.absolute()))
-#     for unit in mat.get_units():
-#         template = unit.get_template_max()
-#         length = template.size
-#         index = np.argmin(template)
-#         if index not in indices:
-#             indices[index] = 1
-#             plt.plot(template)
-#             plt.title(f"Index {index} | {template[index-1]:.2f}, {template[index]:.2f}, {template[index+1]:.2f}")
-#             plt.show()
-#         else:
-#             indices[index] += 1
-#
-#         if length not in template_lengths:
-#             template_lengths[length] = 1
-#         else:
-#             template_lengths[length] += 1
-#
-#
-# for index, count in indices.items():
-#     print(f"Index {index}: {count}")
-# print(template_lengths)
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Load waveforms
-waveforms = np.load("data/waveforms_216.npy")
+waveforms = np.load("data/waveforms_22.npy")
 n_spikes, n_samples, n_chans = waveforms.shape
 
 # Get max channel
@@ -67,7 +35,7 @@ def plot_all():
     # Plot waveforms centered on actual negative peak
     a1.set_title("Centered using Calculated Negative Peak")
     a1.set_xlim(0, waveforms_max.shape[1])
-    nbefore = nafter = 50
+    nbefore = nafter = 15
     for wave in waveforms_max:
         peak_ind = get_peak_index(wave)
         wave_recentered = wave[peak_ind - nbefore:peak_ind + nafter]
