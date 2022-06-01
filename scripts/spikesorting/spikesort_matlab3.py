@@ -44,6 +44,14 @@ assert len(recording_files) == len(intermediate_folders) == len(matlab_folders),
 kilosort_path = "/home/maxlim/SpikeSorting/Kilosort2"  # "/home/vandermolen/Kilosort"
 hdf5_plugin_path = '/home/maxlim/SpikeSorting/extra_libraries/'  # '/home/vandermolen/SpikeSorting/extra_libraries/'
 
+# If True, script will automatically run the following commands for pod-gpu.cnsi.ucsb.edu:
+"""
+export MW_NVCC_PATH=/usr/local/cuda-10.1/bin
+module load MatLab/R2021b 
+module load cuda/10.1
+"""
+auto_setup_pod_env = True
+
 # Kilosort2 params
 kilosort_params = {
     'detect_threshold': 6,
@@ -141,6 +149,9 @@ isi_viol_thresh = 0.3
 max_norm_std = 0.3
 # If True, use the standard deviation at the peak. If False, use the average standard deviation over the waveform window
 max_norm_at_peak = True
+# Number of samples before/after Kilosort2's spike time to look for peak. (None-> all samples in waveform are used)
+peak_window_nbefore = 25  # TODO: Implement? The error in 220531_graphs could be caused by amplitudes being too low
+peak_window_nafter = 25
 # If max_norm_at_peak = False, the waveform window for the average standard deviation
 max_norm_over_window_ms_before = 0.5
 max_norm_over_window_ms_after = 1.5
@@ -199,6 +210,7 @@ import tempfile
 import shutil
 import signal
 from pathlib import Path
+import json
 from typing import Optional, List, Any, Union
 from tqdm import tqdm
 from scipy.io import savemat
@@ -564,14 +576,21 @@ end'''
     def execute_kilosort_file(output_folder, verbose):
         print('Running kilosort file')
 
-        os.environ['MW_NVCC_PATH'] = "/usr/local/cuda-10.1/bin"
-        shell_cmd = f'''
-                    #!/bin/bash
-                    cd "{output_folder}"
-                    module load MatLab/R2021b
-                    module load cuda/10.1
-                    matlab -nosplash -nodisplay -log -r kilosort2_master
-                '''
+        if auto_setup_pod_env:
+            os.environ['MW_NVCC_PATH'] = "/usr/local/cuda-10.1/bin"
+            shell_cmd = f'''
+                        #!/bin/bash
+                        cd "{output_folder}"
+                        module load MatLab/R2021b
+                        module load cuda/10.1
+                        matlab -nosplash -nodisplay -log -r kilosort2_master
+                    '''
+        else:
+            shell_cmd = f'''
+                        #!/bin/bash
+                        cd "{output_folder}"
+                        matlab -nosplash -nodisplay -log -r kilosort2_master
+                    '''
         shell_script = ShellScript(shell_cmd, script_path=output_folder / 'run_kilosort2',
                                    log_path=output_folder / 'kilosort2.log', verbose=verbose)
         shell_script.start()
@@ -702,7 +721,7 @@ class KilosortSortingExtractor:
         # Exclude units with 0 spikes
         for unit_id in all_unit_ids:
             if unit_id in unit_ids_with_spike:
-                self.unit_ids.append(unit_id)
+                self.unit_ids.append(int(unit_id))
 
     def id_to_index(self, id):
         # Returns the index of the waveform unit id in the stored list
@@ -1344,7 +1363,7 @@ class WaveformExtractor:
             template = np.std(wfs, axis=0)
         return template
 
-    def compute_templates(self, modes=('average', 'std')):
+    def compute_templates(self, modes=('average', 'std'), unit_ids=None):
         """
         Compute all template for different "modes":
           * average
@@ -1353,13 +1372,24 @@ class WaveformExtractor:
 
         The results are cached in memory as 3d ndarray (nunits, nsamples, nchans)
         and also saved as npy file in the folder to avoid recomputation each time.
+
+        Parameters
+        ----------
+        modes: tuple
+            Template modes to compute (average, std, median)
+        unit_ids: None or List
+            Unit ids to compute templates for
+            If None-> unit ids are taken from self.sorting.unit_ids
+
         """
         # TODO : run this in parralel
 
         print_stage("COMPUTING TEMPLATES")
         print("Template modes: " + ", ".join(modes))
         stopwatch = Stopwatch()
-        unit_ids = self.sorting.unit_ids
+
+        if unit_ids is None:
+            unit_ids = self.sorting.unit_ids
         num_chans = self.recording.get_num_channels()
 
         for mode in modes:
@@ -2423,7 +2453,7 @@ class Curation:
             Must have sorting.unit_ids and sorting.get_unit_spike_train(unit_id=)
         Returns
         -------
-        Curated unit ids as np.array
+        Curated unit ids as list
         """
         print_stage("CURATING MIN SPIKES PER UNIT")
         stopwatch = Stopwatch()
@@ -2434,7 +2464,7 @@ class Curation:
                 curated_unit_ids.append(unit_id)
         print(f'N units after minimum spikes per unit curation: {len(curated_unit_ids)}')
         stopwatch.log_time()
-        return np.asarray(curated_unit_ids)
+        return curated_unit_ids
 
     @staticmethod
     def firing_rate(recording, sorting):
@@ -2451,7 +2481,7 @@ class Curation:
 
         Returns
         -------
-        Curated unit ids as np.array
+        Curated unit ids as list
         """
         print_stage("CURATING FIRING RATE")
         stopwatch = Stopwatch()
@@ -2463,7 +2493,7 @@ class Curation:
                 curated_unit_ids.append(unit_id)
         print(f'N units after firing rate curation: {len(curated_unit_ids)}')
         stopwatch.log_time()
-        return np.asarray(curated_unit_ids)
+        return curated_unit_ids
 
     @staticmethod
     def isi_violation(recording, sorting, isi_threshold_ms=1.5, min_isi_ms=0):
@@ -2493,7 +2523,7 @@ class Curation:
 
         Returns
         -------
-        Curated unit ids as np.array
+        Curated unit ids as list
 
         Notes
         -----
@@ -2538,7 +2568,7 @@ class Curation:
                 curated_unit_ids.append(unit_id)
         print(f'N units after ISI violation curation: {len(curated_unit_ids)}')
         stopwatch.log_time()
-        return np.asarray(curated_unit_ids)
+        return curated_unit_ids
 
     @staticmethod
     def max_norm_std(waveform_extractor, peak_sign='neg'):
@@ -2558,13 +2588,17 @@ class Curation:
 
         Returns
         -------
-        Curated unit ids as np.array
+        Curated unit ids as list
         """
         print_stage("CURATING MAX NORMALIZED STD")
         stopwatch = Stopwatch()
+
         template_amplitudes, channel_max_indices = waveform_extractor.get_template_extremums(peak_sign=peak_sign)
+
         curated_unit_ids = []
-        for unit_id in waveform_extractor.sorting.unit_ids:
+        unit_ids = waveform_extractor.sorting.unit_ids
+        print(f"Iterating through {len(unit_ids)} units")
+        for unit_id in tqdm(unit_ids):
             waveforms = waveform_extractor.get_waveforms(unit_id)[:, :, channel_max_indices[unit_id]]
             peak_ind = WaveformExtractor.get_peak_ind(waveforms, peak_sign=peak_sign)
             if max_norm_at_peak:
@@ -2584,7 +2618,7 @@ class Curation:
 
         print(f'N units after max normalized std: {len(curated_unit_ids)}')
         stopwatch.log_time()
-        return np.asarray(curated_unit_ids)
+        return curated_unit_ids
 
     @staticmethod
     def snr(waveform_extractor, peak_sign='neg'):
@@ -2620,7 +2654,7 @@ class Curation:
 
         print(f"N units after SNR curation: {len(curated_unit_ids)}")
         stopwatch.log_time()
-        return np.asarray(curated_unit_ids)
+        return curated_unit_ids
 
     # region For getting noise levels for curate_snr
     @staticmethod
@@ -2963,14 +2997,17 @@ def extract_waveforms(recording, sorting, folder,
         create_folder(folder)
         we = WaveformExtractor.create(recording, sorting, folder)
         we.run_extract_waveforms(**job_kwargs)
-        we.compute_templates(modes=('average',))  # add 'std'?
         stopwatch.log_time("Done extracting waveforms.")
     return we
 
 
-def curate_units(recording, sorting, we_raw, curated_folder):
+def curate_units(we_raw, curated_folder):
     print_stage("CURATING UNITS")
     stopwatch = Stopwatch()
+
+    recording = we_raw.recording
+    sorting = we_raw.sorting
+
     if not recompute_curation and (curated_folder/'waveforms').exists():
         print("Skipping data curation since already curated.")
         print("Loading saved curated data.")
@@ -2986,33 +3023,65 @@ def curate_units(recording, sorting, we_raw, curated_folder):
     unit_ids_initial = sorting.unit_ids
     print(f'N units before curation: {len(unit_ids_initial)}')
 
+    # Save which units passed each curation gate (cascading curation)
+    curation_history = {
+        "curation_parameters": {
+            "min_spikes_per_unit": min_spikes_per_unit,
+            "fr_thresh": fr_thresh,
+            "isi_viol_thresh": isi_viol_thresh,
+            "max_norm_std": max_norm_std,
+            "max_norm_at_peak": max_norm_at_peak,
+            # "peak_window_nbefore": peak_window_nbefore,
+            # "peak_window_nafter": peak_window_nafter,
+            "max_norm_over_window_ms_before": max_norm_over_window_ms_before,
+            "max_norm_over_window_ms_after": max_norm_over_window_ms_after,
+            "snr_thresh": snr_thresh
+        },
+        "initial": unit_ids_initial
+    }
+
     # Minimum spikes per unit
     if min_spikes_per_unit is not None:
         unit_ids_curated_min_spikes = Curation.min_spikes_per_unit(sorting)
+        curation_history["min_spikes"] = unit_ids_curated_min_spikes
         sorting.unit_ids = unit_ids_curated_min_spikes
 
     # Firing rate
     if fr_thresh is not None:
         unit_ids_curated_fr = Curation.firing_rate(recording, sorting)
+        curation_history["fr_thresh"] = unit_ids_curated_fr
         sorting.unit_ids = unit_ids_curated_fr
 
     # Interspike interval
     if isi_viol_thresh is not None:
         unit_ids_curated_isi = Curation.isi_violation(recording, sorting)
+        curation_history["isi"] = unit_ids_curated_isi
         sorting.unit_ids = unit_ids_curated_isi
+
+    # NOTE: Computing templates here saves time, but not all units in waveforms_raw will have templates
+    we_raw.compute_templates(modes=('average',))  # add 'std'?
 
     # Maximum normalized standard deviation
     if max_norm_std is not None:
         unit_ids_curated_max_std = Curation.max_norm_std(we_raw)
+        curation_history["max_std"] = unit_ids_curated_max_std
         sorting.unit_ids = unit_ids_curated_max_std
 
     # Signal-to-noise ratio
     if snr_thresh is not None:
         unit_ids_curated_snr = Curation.snr(we_raw)
+        curation_history["snr"] = unit_ids_curated_snr
         sorting.unit_ids = unit_ids_curated_snr
 
     # Save only the curated waveforms to a new file
     we_curated = we_raw.save_curated_units(unit_ids=sorting.unit_ids, curated_folder=curated_folder)
+
+    # Save curation history
+    print_stage("SAVING CURATION HISTORY")
+    stopwatch = Stopwatch()
+    with open(curated_folder / "curation_history.json", "w") as f:
+        json.dump(curation_history, f)
+    stopwatch.log_time("Done.")
 
     return we_curated
 
@@ -3048,9 +3117,10 @@ def process_recording(rec_path, inter_path):
                                n_jobs=n_jobs, total_memory=total_memory, progress_bar=True)
 
     # Curating Data
-    waveform_extractor = curate_units(recording_filtered, sorting, we_raw, waveforms_curated_folder)
+    waveform_extractor = curate_units(we_raw, waveforms_curated_folder)
 
-    stopwatch.log_time("\nDone processing recording.")
+    print_stage("DONE PROCESSING RECORDING")
+    stopwatch.log_time("Total")
 
     return waveform_extractor
 
