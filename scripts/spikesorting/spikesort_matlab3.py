@@ -5,8 +5,8 @@
 # If path is a folder with multiple recording files,
 # they will be concatenated in natural ordering.
 recording_files = [
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2950.raw.h5",
     "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2953.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2953.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2954.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2957.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_5116.raw.h5",
@@ -15,7 +15,8 @@ recording_files = [
 # List of intermediate folders where Kilosort2 files and waveforms are saved
 intermediate_folders = [
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2950",
-    "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2953",
+    "/home/maxlim/SpikeSorting/data/test/220604/maxone_2953/no_float_curation",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2953",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2954",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2957",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_5116",
@@ -25,8 +26,10 @@ intermediate_folders = [
 # List of output folders where final matlab files are saved.
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 matlab_folders = [
+    "/home/maxlim/SpikeSorting/data/test/220604/maxone_2953/no_float_curation",
+    # "/home/maxlim/SpikeSorting/data/test/220601/maxone_2953/float32_3_curation",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
-    "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2953",
+    # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted"
@@ -74,7 +77,7 @@ kilosort_params = {
 ######################################################
 # If True and exists, its entire parent folder is deleted and recomputed
 # (5/19/2022) If False and exists and new recording is specified in recording_files, it will not be computed and the old data will be used.
-recompute_recording = False  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
+recompute_recording = True  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
 recompute_sorting = False  # If True, entire intermediate_folder will be deleted
 recompute_waveforms = False
 recompute_curation = True
@@ -108,10 +111,9 @@ freq_max = 6000
 ######################################################
 ###############  WAVEFORM PARAMETERS  ################
 ######################################################
-# ms before waveform trough to include
-ms_before = 5.
-# ms after waveform trough to include
-ms_after = 5.
+# ms before and after waveform trough (negative peak) to extract
+ms_before = 3
+ms_after = 3
 # If True and recording has gain_to_uV/offset_to_uV properties, waveforms are converted to uV
 return_scaled = True
 # Maximum number of waveforms (spikes) per unit to compute templates and extract (None-> all spikes are used)
@@ -984,6 +986,7 @@ class KilosortSortingSegment(BaseSegment):
 
 # region Extract Waveforms
 class WaveformExtractor:
+    # region Initialize
     def __init__(self, recording, sorting, folder):
         # region Sanity checks to make sure recording and sorting match
         assert recording.get_num_segments() == sorting.get_num_segments(), \
@@ -1028,12 +1031,16 @@ class WaveformExtractor:
         dtype = np.dtype(dtype)
         self.dtype = dtype.str
 
-    def ms_to_samples(self, ms):
-        return int(ms * self.sampling_frequency / 1000.)
+    @classmethod
+    def create(cls, recording, sorting, folder):
+        # Create new waveform extractor
+        folder = Path(folder)
+        create_folder(folder / 'waveforms')
+        return cls(recording, sorting, folder)
 
-    # region Loading saved waveform extractor
     @classmethod
     def load_from_folder(cls, recording, sorting, folder):
+        # Load waveform data from folder
         we = cls(recording, sorting, folder)
 
         _possible_template_modes = ('average', 'std', 'median')
@@ -1044,14 +1051,9 @@ class WaveformExtractor:
                 we.template_cache[mode] = np.load(template_file)
 
         return we
-    # endregion
 
-    # region Creating new waveform extractor
-    @classmethod
-    def create(cls, recording, sorting, folder):
-        folder = Path(folder)
-        create_folder(folder / 'waveforms')
-        return cls(recording, sorting, folder)
+    def ms_to_samples(self, ms):
+        return int(ms * self.sampling_frequency / 1000.)
     # endregion
 
     # region Extract waveforms
@@ -1249,6 +1251,7 @@ class WaveformExtractor:
         worker_ctx['unit_cum_sum'] = unit_cum_sum
 
         return worker_ctx
+
     # endregion
 
     # region Get waveforms and templates
@@ -1512,14 +1515,21 @@ class WaveformExtractor:
         waveforms_peaks = waveforms == peak_mask
         return np.asarray([(indices := np.flatnonzero(peaks))[indices.size//2] for peaks in waveforms_peaks])
 
-    def save_curated_units(self, unit_ids, curated_folder):
+    def load_unit_ids(self):
+        unit_ids_folder = self.folder / "unit_ids.npy"
+
+        assert unit_ids_folder.exists(), "Cannot load curated waveform unit_ids since they have not been computed and saved yet"
+
+        return np.load(unit_ids_folder)
+    # endregion
+
+    # region Format files
+    def save_curated_units(self, curated_folder):
         """
         Filters units by storing curated units in a new folder.
 
         Parameters
         ----------
-        unit_ids : list or array
-            The unit ids to keep in the new WaveformExtractor object
         curated_folder : Path
             The new folder where curated waveforms are copied
 
@@ -1530,17 +1540,18 @@ class WaveformExtractor:
         """
         print_stage("SAVING CURATED UNITS")
         stopwatch = Stopwatch()
-
-        print("Saving curated units to new folder")
+        unit_ids = self.sorting.unit_ids
+        print(f"Saving {len(unit_ids)} curated units to new folder")
         create_folder(curated_folder)
 
         # Save unit_ids
         np.save(str(curated_folder/"unit_ids.npy"), unit_ids)
 
-        # create and populate waveforms folder
+        # Create waveforms folder
         curated_waveforms_folder = curated_folder / "waveforms"
         create_folder(curated_waveforms_folder)
 
+        # Copy .npy waveform files to new folder
         waveforms_files = [f for f in (self.folder / "waveforms").iterdir() if f.suffix == ".npy"]
         for unit in unit_ids:
             for wf_file in waveforms_files:
@@ -1552,14 +1563,7 @@ class WaveformExtractor:
 
         return we
 
-    def load_unit_ids(self):
-        unit_ids_folder = self.folder / "unit_ids.npy"
-
-        assert unit_ids_folder.exists(), "Cannot load curated waveform unit_ids since they have not been computed and saved yet"
-
-        return np.load(unit_ids_folder)
     # endregion
-
 
 class ChunkRecordingExecutor:
     """
@@ -2599,17 +2603,17 @@ class Curation:
         unit_ids = waveform_extractor.sorting.unit_ids
         print(f"Iterating through {len(unit_ids)} units")
         for unit_id in tqdm(unit_ids):
-            waveforms = waveform_extractor.get_waveforms(unit_id)[:, :, channel_max_indices[unit_id]]
+            chan_max = channel_max_indices[unit_id]
+            waveforms = waveform_extractor.get_waveforms(unit_id)[:, :, chan_max]
             peak_ind = WaveformExtractor.get_peak_ind(waveforms, peak_sign=peak_sign)
             if max_norm_at_peak:
                 std = np.std(waveforms[np.arange(peak_ind.size), peak_ind])
             else:
-                nbefore = waveform_extractor.ms_to_samples(max_norm_over_window_ms_before)
-                nafter = waveform_extractor.ms_to_samples(max_norm_over_window_ms_after)
-                std_sum = 0
-                for i, peak_ind in enumerate(peak_ind):
-                    std_sum += np.std(waveforms[i, peak_ind-nbefore:peak_ind+nafter])
-                std = std_sum / peak_ind.size
+                n_before = waveform_extractor.ms_to_samples(max_norm_over_window_ms_before)
+                n_after = waveform_extractor.ms_to_samples(max_norm_over_window_ms_after)
+
+                waveforms_windows = np.vstack([wf[ind-n_before:ind+n_after] for wf, ind in zip(waveforms, peak_ind)])
+                std = np.std(waveforms_windows, axis=0).mean()
 
             amp_avg = template_amplitudes[unit_id]
             std_scaled = std / amp_avg
@@ -2925,7 +2929,8 @@ def write_recording(recording, recording_dat_path, verbose=True):
     stopwatch = Stopwatch()
 
     print("Using bandpass filter")
-    recording_filtered = bandpass_filter(recording, freq_min=freq_min, freq_max=freq_max)
+    # recording_filtered = bandpass_filter(recording, freq_min=freq_min, freq_max=freq_max)
+    recording_filtered = bandpass_filter(recording, freq_min=freq_min, freq_max=freq_max, dtype="float32")
 
     print(f"Kilosort2's .dat path: {recording_dat_path}")
     if recompute_recording or not recording_dat_path.exists():
@@ -2997,6 +3002,7 @@ def extract_waveforms(recording, sorting, folder,
         create_folder(folder)
         we = WaveformExtractor.create(recording, sorting, folder)
         we.run_extract_waveforms(**job_kwargs)
+        we.compute_templates(modes=('average',))
         stopwatch.log_time("Done extracting waveforms.")
     return we
 
@@ -3059,7 +3065,7 @@ def curate_units(we_raw, curated_folder):
         sorting.unit_ids = unit_ids_curated_isi
 
     # NOTE: Computing templates here saves time, but not all units in waveforms_raw will have templates
-    we_raw.compute_templates(modes=('average',))  # add 'std'?
+    # we_raw.compute_templates(modes=('average',))  # add 'std'?
 
     # Maximum normalized standard deviation
     if max_norm_std is not None:
@@ -3074,7 +3080,7 @@ def curate_units(we_raw, curated_folder):
         sorting.unit_ids = unit_ids_curated_snr
 
     # Save only the curated waveforms to a new file
-    we_curated = we_raw.save_curated_units(unit_ids=sorting.unit_ids, curated_folder=curated_folder)
+    we_curated = we_raw.save_curated_units(curated_folder=curated_folder)
 
     # Save curation history
     print_stage("SAVING CURATION HISTORY")
