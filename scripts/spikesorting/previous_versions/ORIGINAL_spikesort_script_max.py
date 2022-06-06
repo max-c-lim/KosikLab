@@ -41,7 +41,7 @@ assert len(recording_files) == len(intermediate_folders), "'recording_files' and
 # sorter name
 sorter = 'kilosort2'
 # sorter params
-sorter_params = {"n_jobs_bin": 1, "total_memory": "4G"}
+sorter_params = {"n_jobs_bin": 1, "TOTAL_MEMORY": "4G"}
 
 ############################################
 ################  PARAMS ###################r 

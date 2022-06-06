@@ -79,9 +79,9 @@ print(np.all(np.isclose(traces_g4[:chunk_size], traces_g6[:chunk_size])))
 # Todo: Look at traces near the end of the chunk. Traces seem to be identical in beginning but different at chunk border
 """
 When using 64 jobs...
-total_memory = 4G: 30637 chunk_size, 118 chunks, 36s total, 3.22it/s
-total_memory = 6G: 45955 chunk_size, 79 chunks, 39s total, 2.01it/s
-total_memory = 10G: 76593 chunk_size, 47 chunks, 48s, 1.02s/it
+TOTAL_MEMORY = 4G: 30637 chunk_size, 118 chunks, 36s total, 3.22it/s
+TOTAL_MEMORY = 6G: 45955 chunk_size, 79 chunks, 39s total, 2.01it/s
+TOTAL_MEMORY = 10G: 76593 chunk_size, 47 chunks, 48s, 1.02s/it
 """
 
 # plt.plot(traces_g4[:200, 4])

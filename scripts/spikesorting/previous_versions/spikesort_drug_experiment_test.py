@@ -20,8 +20,8 @@ mpl.use("agg")
 ################  INPUTS ###################
 ############################################
 
-recordings_path = Path("/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2953.raw.h5")
-inter_path = Path("/home/maxlim/SpikeSorting/data/DL/sorted/processed/si/maxone_2953")
+recordings_path = Path("/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2950.raw.h5")
+inter_path = Path("/home/maxlim/SpikeSorting/data/DL/sorted/processed/alessio/maxone_2950")
 ss.Kilosort2Sorter.set_kilosort2_path("/home/maxlim/SpikeSorting/Kilosort2")
 os.environ['HDF5_PLUGIN_PATH'] = '/home/maxlim/SpikeSorting/extra_libraries/'
 
@@ -116,7 +116,7 @@ else:
     rec_f = st.preprocessing.bandpass_filter(recording, freq_min=freq_min, freq_max=fre_max, dtype='float32')
     rec_cache = rec_f
     # rec_cache = se.CacheRecordingExtractor(rec_f, save_path=cache_folder / 'recording.dat',
-    #                                        chunk_mb=chunk_mb, n_jobs=n_jobs, verbose=True)
+    #                                        chunk_mb=chunk_mb, N_JOBS=N_JOBS, verbose=True)
     stop = time.time()
     print(f'Elapsed filter time {np.round(stop - start, 2)}\n')
     fs = rec_f.get_sampling_frequency()
@@ -150,7 +150,7 @@ print(f"Total units found by {sorter}: {len(sorting.get_unit_ids())}")
 # if export_raw_to_phy and not (sorting_cache / "phy_raw").is_folder():
 #     print("Exporting raw sorting output to Phy")
 #     st.postprocessing.export_to_phy(rec_cache, sorting, cache_folder / "phy_raw",
-#                                     n_jobs=n_jobs, chunk_mb=chunk_mb)
+#                                     N_JOBS=N_JOBS, chunk_mb=chunk_mb)
 
 ### Auto-curation ###
 if auto_curate:
@@ -223,7 +223,7 @@ if auto_curate:
 #     # compute templates anyways
 #     wf = st.postprocessing.get_unit_waveforms(rec_cache, sorting, chunk_mb=chunk_mb,
 #                                               max_spikes_per_unit=max_spikes_per_unit,
-#                                               n_jobs=n_jobs, verbose=True)
+#                                               N_JOBS=N_JOBS, verbose=True)
 #     templates = st.postprocessing.get_unit_templates(rec_cache, sorting)
 #
 #     # compute COM on templates

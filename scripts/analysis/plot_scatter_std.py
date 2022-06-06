@@ -41,7 +41,7 @@ ms_before = 0.5
 ms_after = 1.5
 
 # Sampling frequency of waveforms (in Hz)
-# If None, ms_before and ms_after will be number of samples (rather than ms)
+# If None, WAVEFORMS_MS_BEFORE and WAVEFORMS_MS_AFTER will be number of samples (rather than ms)
 sampling_frequency = 20000.
 
 # If True and template exists as .npy file, delete .npy file and recompute it

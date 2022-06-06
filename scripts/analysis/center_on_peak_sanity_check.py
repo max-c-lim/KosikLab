@@ -1,9 +1,14 @@
 # Imports
 from scipy.io import loadmat
-import matplotlib.pyplot as plt
 import numpy as np
+from spikeinterface.extractors import MaxwellRecordingExtractor
+from spikeinterface.toolkit.preprocessing import bandpass_filter
+import matplotlib.pyplot as plt
+import matplotlib.axes._axes as axes
+import matplotlib.figure as figure
 
 
+# region extract_mat.py
 class MatExtractor:
     def __init__(self, path, max_unit_id=None):
         """
@@ -19,9 +24,6 @@ class MatExtractor:
         self.name = "_".join(path.split("/")[-2:])
         self.dict = loadmat(path)
         self.units = self.get_units(max_unit_id)
-
-    def get_sampling_frequency(self):
-        return self.dict["fs"].squeeze()
 
     def _get_units_raw(self):
         # Returns array of units in struct form (raw form from scipy)
@@ -85,8 +87,6 @@ class MatExtractor:
             spike_trains.append(unit_spike_train)
 
         return spike_trains
-
-
 class Unit:
     """
     Represents a unit in the .mat file
@@ -149,58 +149,53 @@ class Unit:
         # This will correspond to the cleanest template since it will be the template recorded by the closest electrode
 
         return self.get_template()[:, self.get_chan_max()]
+# endregion
 
 
-def find_similar_units(mat_extractor1, mat_extractor2):
-    """
-    Finds which units in mat_extractor1 correspond to mat_extractor2
-
-    Parameters
-    ----------
-    mat_extractor1: MatExtractor
-    mat_extractor2: MatExtractor
-
-    """
-    similar_total = 0
-    from tqdm import tqdm
-    for unit1 in tqdm(mat_extractor1.get_units()):  # type: Unit
-        st1 = unit1.get_spike_train()
-        electrode1 = unit1.get_electrode()
-        for unit2 in mat_extractor2.get_units():  # type: Unit
-            st2 = unit2.get_spike_train()
-            electrode2 = unit2.get_electrode()
-            if electrode1 != electrode2:
-                continue
-
-            similar = True
-            rtol = 0.00001
-            if st2.size < st1.size:
-                for time in st2:
-                    if not np.any(np.isclose(time, st1, rtol=rtol)):
-                        similar = False
-                        break
-            elif st1.size < st2.size:
-                for time in st1:
-                    if not np.any(np.isclose(time, st2, rtol=rtol)):
-                        similar = False
-                        break
-            else:
-                similar = np.all(np.isclose(st1, st2, rtol=rtol))
-
-            if similar:
-                similar_total += 1
-                print(f"Mat 1: {unit1.get_id()} | Mat 2: {unit2.get_id()}")
-                plt.plot(unit1.get_template_max())
-                plt.plot(unit2.get_template_max())
-                plt.show()
-                break
-    print(similar_total)
+def cache_recording_filtered():
+    recording = MaxwellRecordingExtractor(path_recording_raw)
+    rec_filtered = bandpass_filter(recording, freq_min=300, freq_max=6000)
+    print("Saving filtered recording")
+    rec_filtered.save(folder=path_recording_cache, verbose=True)
 
 
-def main():
-    mat = MatExtractor("data/float32/float32_maxone_2953_sorted.mat")
-    unit = mat.get_unit(195)
-    print(unit.get_spike_train())
+def load_recording_filtered():
+    return MaxwellRecordingExtractor.load_from_folder(path_recording_cache)
 
-if __name__ == "__main__":
-    main()
+
+path_recording_raw = "/home/maxlim/SpikeSorting/data/DL/recordings/maxone_2953.raw.h5"
+path_recording_cache = "data/maxone_2953_filtered"
+
+recording = load_recording_filtered()  # type: MaxwellRecordingExtractor
+mat = MatExtractor("data/maxone_2953_sorted.mat")
+
+test = mat.get_unit(31)
+spike_train = test.get_spike_train()
+chan_max = test.get_chan_max()
+
+buffer = 10
+
+total = 0
+for time in spike_train:
+    start_frame = int(time - buffer)
+    end_frame = int(time + buffer)
+
+    window = recording.get_traces(start_frame=start_frame, end_frame=end_frame)[:, chan_max]
+    correct_value = window.min()
+    correct_indices = np.flatnonzero(window == correct_value)
+    correct = correct_indices[correct_indices.size//2] + start_frame
+    if correct != time:
+        print(correct, time)
+        fig, a0 = plt.subplots(1)  # type:figure.Figure, axes.Axes
+        x_values = np.arange(start_frame, end_frame)
+        a0.plot(x_values, window)
+        a0.set_xticks(x_values)
+        a0.axvline(time)
+        plt.show()
+    else:
+        total += 1
+
+
+print("-"*50)
+print(total)
+
