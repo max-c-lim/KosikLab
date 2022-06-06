@@ -4,7 +4,7 @@ HYPOTHESIS: IF computing bandpass_filter lazily causes slowing traces retrieval,
             THEN, getting traces from recording without bandpass_filter will be much faster
 """
 
-from spikeinterface.extractors import MaxwellRecordingExtractor
+from spikeinterface.extractors import MaxwellRecordingExtractor, BinaryRecordingExtractor
 from spikeinterface.toolkit.preprocessing import bandpass_filter
 import time
 from shutil import rmtree
@@ -37,7 +37,7 @@ FREQ_MIN = 300
 FREQ_MAX = 6000
 
 start_frame = 1000
-n_samples = int(1e7)
+n_samples = int(5e4)
 end_frame = start_frame + n_samples
 
 maxwell = MaxwellRecordingExtractor(REC_PATH)
@@ -53,6 +53,15 @@ traces = maxwell_filtered.get_traces(start_frame=start_frame, end_frame=end_fram
 stopwatch.log_time("Done.")
 del traces
 
+stopwatch = Stopwatch("\nWriting binary recording using lazy filtered recording")
+lazy_binary_path = SAVE_DATA_PATH + "/maxwell_2953_lazy_filtered.dat"
+if path_exists(lazy_binary_path):
+    rmtree(lazy_binary_path)
+BinaryRecordingExtractor.write_recording(maxwell_filtered, file_paths=lazy_binary_path,
+                                         dtype='int16', progress_bar=True,
+                                         n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
+stopwatch.log_time("Done.")
+
 maxwell_filtered_saved_path = SAVE_DATA_PATH + "/maxwell_2953_filtered_cache"
 if path_exists(maxwell_filtered_saved_path):
     rmtree(maxwell_filtered_saved_path)
@@ -63,4 +72,14 @@ stopwatch.log_time("Done.")
 
 stopwatch = Stopwatch("\nGetting traces from saved filtered recording")
 traces = maxwell_filtered_saved.get_traces(start_frame=start_frame, end_frame=end_frame)
+stopwatch.log_time("Done.")
+del traces
+
+stopwatch = Stopwatch("\nWriting binary recording using saved filtered recording")
+binary_path = SAVE_DATA_PATH + "/maxwell_2953_filtered.dat"
+if path_exists(binary_path):
+    rmtree(binary_path)
+BinaryRecordingExtractor.write_recording(maxwell_filtered_saved, file_paths=binary_path,
+                                         dtype='int16', progress_bar=True,
+                                         n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
 stopwatch.log_time("Done.")

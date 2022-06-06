@@ -26,7 +26,7 @@ matlab_folders = [
     "/home/maxlim/SpikeSorting/data/maxone/200123/2950/concatenated"
 ]
 
-assert len(recording_files) == len(intermediate_folders) == len(matlab_folders), "'recording_files' and 'intermediate_folders' and 'MATLAB_FOLDERS' " \
+assert len(recording_files) == len(intermediate_folders) == len(matlab_folders), "'recording_files' and 'intermediate_folders' and 'matlab_folders' " \
                                                                                  "should all have the same length"
 
 ######################################################
@@ -45,14 +45,14 @@ kilosort_params = {
     'car': True,
     'minFR': 0.1,
     'minfr_goodchannels': 0.1,
-    'FREQ_MIN': 150,
+    'freq_min': 150,
     'sigmaMask': 30,
     'nPCs': 3,
     'ntbuff': 64,
     'nfilt_factor': 4,
     'NT': None,
     'keep_good_only': False,
-    'TOTAL_MEMORY': "64G",  # Too low memory will cause error
+    'total_memory': "64G",  # Too low memory will cause error
     'n_jobs_bin': 16
 }
 
@@ -102,7 +102,7 @@ snr_thresh = 5
 n_jobs = kilosort_params["n_jobs_bin"]
 # Total RAM to use for curation
 # DEFAULT: Same as Kilosort
-total_memory = kilosort_params["TOTAL_MEMORY"]
+total_memory = kilosort_params["total_memory"]
 
 # Number of spikes per unit to compute templates (None-> all spikes are used)
 max_spikes_per_unit = None
@@ -256,7 +256,7 @@ class RunKilosort:
         ops.chanMap             = fullfile('chanMap.mat'); % make this file using createChannelMapFile.m
 
         % frequency for high pass filtering (150)
-        ops.fshigh = {FREQ_MIN};
+        ops.fshigh = {freq_min};
 
         % minimum firing rate on a "good" channel (0 to skip)
         ops.minfr_goodchannels = {minfr_goodchannels};
@@ -331,7 +331,7 @@ class RunKilosort:
             preclust_threshold=kilosort_params['preclust_threshold'],
             minfr_goodchannels=kilosort_params['minfr_goodchannels'],
             minFR=kilosort_params['minFR'],
-            freq_min=kilosort_params['FREQ_MIN'],
+            freq_min=kilosort_params['freq_min'],
             sigmaMask=kilosort_params['sigmaMask'],
             kilo_thresh=kilosort_params['detect_threshold'],
             use_car=kilosort_params['car'],
@@ -564,10 +564,10 @@ end'''
         path = str(Path(kilosort_path).absolute())
 
         try:
-            print("Setting KILOSORT_PATH environment variable for subprocess calls to:", path)
-            os.environ["KILOSORT_PATH"] = path
+            print("Setting KILOSORT2_PATH environment variable for subprocess calls to:", path)
+            os.environ["KILOSORT2_PATH"] = path
         except Exception as e:
-            print("Could not set KILOSORT_PATH environment variable:", e)
+            print("Could not set KILOSORT2_PATH environment variable:", e)
 
         return path
 
@@ -872,11 +872,11 @@ class WaveformExtractor:
     # region Properties containing metadata needed for extraction
     @property
     def nbefore(self):
-        return int(self._params['WAVEFORMS_MS_BEFORE'] * self.sampling_frequency / 1000.)
+        return int(self._params['ms_before'] * self.sampling_frequency / 1000.)
 
     @property
     def nafter(self):
-        return int(self._params['WAVEFORMS_MS_AFTER'] * self.sampling_frequency / 1000.)
+        return int(self._params['ms_after'] * self.sampling_frequency / 1000.)
 
     @property
     def nsamples(self):
@@ -884,7 +884,7 @@ class WaveformExtractor:
 
     @property
     def return_scaled(self):
-        return self._params['RETURN_SCALED']
+        return self._params['return_scaled']
     # endregion
 
     # region Loading saved waveform extractor
@@ -968,7 +968,7 @@ class WaveformExtractor:
         if return_scaled_corrected:
             # Check if recording has scaled values:
             if not self.recording.has_scaled_traces():
-                print("Setting 'RETURN_SCALED' to False")
+                print("Setting 'return_scaled' to False")
                 return_scaled_corrected = False
 
         if np.issubdtype(dtype, np.integer) and return_scaled_corrected:
@@ -997,7 +997,7 @@ class WaveformExtractor:
         nafter = self.nafter
         return_scaled = self.return_scaled
 
-        job_kwargs["N_JOBS"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('N_JOBS', None))
+        job_kwargs["n_jobs"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('n_jobs', None))
 
         selected_spikes = self.sample_spikes()
 
@@ -1027,7 +1027,7 @@ class WaveformExtractor:
         # region UPDATED
         # ORIGINAL PURPOSE: Saves recording/extractor as a dictionary just to be reverted back to object later
         # REASON FOR REMOVAL: No point to save it if it will be retrieved later - Maybe for memory?
-        # if N_JOBS == 1:
+        # if n_jobs == 1:
         #     init_args = (self.recording, self.sorting,)
         # else:
         #     init_args = (self.recording.to_dict(), self.sorting.to_dict(),)
@@ -1568,7 +1568,7 @@ class CurationMetrics:
 
         extremum_channels_ids = CurationMetrics.get_template_extremum_channel(waveform_extractor, peak_sign=peak_sign)
         unit_amplitudes = CurationMetrics.get_template_extremum_amplitude(waveform_extractor, peak_sign=peak_sign)
-        return_scaled = waveform_extractor.RETURN_SCALED
+        return_scaled = waveform_extractor.return_scaled
         noise_levels = CurationMetrics.get_noise_levels(recording, return_scaled=return_scaled, **kwargs)
 
         # make a dict to access by chan_id
@@ -2061,10 +2061,10 @@ class Utils:
 
         Flexible chunk_size setter with 3 ways:
             * "chunk_size": is the length in sample for each chunk independently of channel count and dtype.
-            * "CHUNK_MEMORY": total memory per chunk per worker
-            * "TOTAL_MEMORY": total memory over all workers.
+            * "chunk_memory": total memory per chunk per worker
+            * "total_memory": total memory over all workers.
 
-        If chunk_size/CHUNK_MEMORY/TOTAL_MEMORY are all None then there is no chunk computing
+        If chunk_size/chunk_memory/total_memory are all None then there is no chunk computing
         and the full trace is retrieved at once.
 
         Parameters
@@ -2099,7 +2099,7 @@ class Utils:
                 # not chunk computing
                 chunk_size = None
             else:
-                raise ValueError('For N_JOBS >1 you must specify TOTAL_MEMORY or chunk_size or CHUNK_MEMORY')
+                raise ValueError('For n_jobs >1 you must specify total_memory or chunk_size or chunk_memory')
 
         return chunk_size
 
@@ -2149,7 +2149,7 @@ class ChunkRecordingExecutor:
     chunk_memory: str
         Memory per chunk (RAM) to use (e.g. "1G", "500M")
     chunk_size: int or None
-        Size of each chunk in number of samples. If 'TOTAL_MEMORY' or 'CHUNK_MEMORY' are used, it is ignored.
+        Size of each chunk in number of samples. If 'total_memory' or 'chunk_memory' are used, it is ignored.
     job_name: str
         Job name
 
@@ -2180,7 +2180,7 @@ class ChunkRecordingExecutor:
         self.job_name = job_name
 
         if verbose:
-            print(self.job_name, 'with', 'N_JOBS', self.n_jobs, ' chunk_size', self.chunk_size)
+            print(self.job_name, 'with', 'n_jobs', self.n_jobs, ' chunk_size', self.chunk_size)
 
     def run(self):
         """
@@ -2257,7 +2257,7 @@ class WorkerChunk:
         selected_spike_times = worker_ctx['selected_spike_times']
         nbefore = worker_ctx['nbefore']
         nafter = worker_ctx['nafter']
-        return_scaled = worker_ctx['RETURN_SCALED']
+        return_scaled = worker_ctx['return_scaled']
         unit_cum_sum = worker_ctx['unit_cum_sum']
 
         seg_size = recording.get_num_samples(segment_index=segment_index)
@@ -2325,7 +2325,7 @@ class WorkerChunk:
         worker_ctx['selected_spike_times'] = selected_spike_times
         worker_ctx['nbefore'] = nbefore
         worker_ctx['nafter'] = nafter
-        worker_ctx['RETURN_SCALED'] = return_scaled
+        worker_ctx['return_scaled'] = return_scaled
 
         num_seg = sorting.get_num_segments()
         unit_cum_sum = {}
@@ -3331,7 +3331,7 @@ def curate_units(rec_cache, sorting, cache_folder):
     print("Done extracting waveforms." + stopwatch.log_time())
 
     if not auto_curate:
-        print("AUTO_CURATE is set to False, so skipping data curation.")
+        print("auto_curate is set to False, so skipping data curation.")
         return we_raw
 
     # Compute quality metrics to determine which waveforms stay

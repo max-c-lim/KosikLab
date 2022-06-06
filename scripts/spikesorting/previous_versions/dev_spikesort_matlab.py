@@ -35,7 +35,7 @@ matlab_folders = [
     # "/home/maxlim/SpikeSorting/data/maxone/200520/5118/sorted",
 ]
 
-assert len(recording_files) == len(intermediate_folders) == len(matlab_folders), "'recording_files' and 'intermediate_folders' and 'MATLAB_FOLDERS' " \
+assert len(recording_files) == len(intermediate_folders) == len(matlab_folders), "'recording_files' and 'intermediate_folders' and 'matlab_folders' " \
                                                                                  "should all have the same length"
 
 ######################################################
@@ -54,14 +54,14 @@ kilosort_params = {
     'car': True,
     'minFR': 0.1,
     'minfr_goodchannels': 0.1,
-    'FREQ_MIN': 150,
+    'freq_min': 150,
     'sigmaMask': 30,
     'nPCs': 3,
     'ntbuff': 64,
     'nfilt_factor': 4,
     'NT': None,  # 65600
     'keep_good_only': False,
-    'TOTAL_MEMORY': "24G",  # Too low memory will cause error
+    'total_memory': "24G",  # Too low memory will cause error
     'n_jobs_bin': 1
 }
 
@@ -113,7 +113,7 @@ snr_thresh = 5
 n_jobs = kilosort_params["n_jobs_bin"]
 # Total RAM to use for curation
 # DEFAULT: Same as Kilosort
-total_memory = kilosort_params["TOTAL_MEMORY"]
+total_memory = kilosort_params["total_memory"]
 
 # Number of spikes per unit to compute templates (None-> all spikes are used)
 max_spikes_per_unit = 500
@@ -270,7 +270,7 @@ class RunKilosort:
         ops.chanMap             = fullfile('chanMap.mat'); % make this file using createChannelMapFile.m
 
         % frequency for high pass filtering (150)
-        ops.fshigh = {FREQ_MIN};
+        ops.fshigh = {freq_min};
 
         % minimum firing rate on a "good" channel (0 to skip)
         ops.minfr_goodchannels = {minfr_goodchannels};
@@ -345,7 +345,7 @@ class RunKilosort:
             preclust_threshold=kilosort_params['preclust_threshold'],
             minfr_goodchannels=kilosort_params['minfr_goodchannels'],
             minFR=kilosort_params['minFR'],
-            freq_min=kilosort_params['FREQ_MIN'],
+            freq_min=kilosort_params['freq_min'],
             sigmaMask=kilosort_params['sigmaMask'],
             kilo_thresh=kilosort_params['detect_threshold'],
             use_car=kilosort_params['car'],
@@ -578,10 +578,10 @@ end'''
         path = str(Path(kilosort_path).absolute())
 
         try:
-            print("Setting KILOSORT_PATH environment variable for subprocess calls to:", path)
-            os.environ["KILOSORT_PATH"] = path
+            print("Setting KILOSORT2_PATH environment variable for subprocess calls to:", path)
+            os.environ["KILOSORT2_PATH"] = path
         except Exception as e:
-            print("Could not set KILOSORT_PATH environment variable:", e)
+            print("Could not set KILOSORT2_PATH environment variable:", e)
 
         return path
 
@@ -921,11 +921,11 @@ class WaveformExtractor:
     # region Properties containing metadata needed for extraction
     @property
     def nbefore(self):
-        return int(self._params['WAVEFORMS_MS_BEFORE'] * self.sampling_frequency / 1000.)
+        return int(self._params['ms_before'] * self.sampling_frequency / 1000.)
 
     @property
     def nafter(self):
-        return int(self._params['WAVEFORMS_MS_AFTER'] * self.sampling_frequency / 1000.)
+        return int(self._params['ms_after'] * self.sampling_frequency / 1000.)
 
     @property
     def nsamples(self):
@@ -933,7 +933,7 @@ class WaveformExtractor:
 
     @property
     def return_scaled(self):
-        return self._params['RETURN_SCALED']
+        return self._params['return_scaled']
 
     # endregion
 
@@ -1019,7 +1019,7 @@ class WaveformExtractor:
         if return_scaled_corrected:
             # Check if recording has scaled values:
             if not self.recording.has_scaled_traces():
-                print("Setting 'RETURN_SCALED' to False")
+                print("Setting 'return_scaled' to False")
                 return_scaled_corrected = False
 
         if np.issubdtype(dtype, np.integer) and return_scaled_corrected:
@@ -1049,7 +1049,7 @@ class WaveformExtractor:
         nafter = self.nafter
         return_scaled = self.return_scaled
 
-        job_kwargs["N_JOBS"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('N_JOBS', None))
+        job_kwargs["n_jobs"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('n_jobs', None))
 
         selected_spikes = self.sample_spikes()
 
@@ -1079,7 +1079,7 @@ class WaveformExtractor:
         # region UPDATED
         # ORIGINAL PURPOSE: Saves recording/extractor as a dictionary just to be reverted back to object later
         # REASON FOR REMOVAL: No point to save it if it will be retrieved later - Maybe for memory?
-        # if N_JOBS == 1:
+        # if n_jobs == 1:
         #     init_args = (self.recording, self.sorting,)
         # else:
         #     init_args = (self.recording.to_dict(), self.sorting.to_dict(),)
@@ -1483,7 +1483,7 @@ class CurationMetrics:
     @staticmethod
     def curate_firing_rates(recording, sorting):
         """
-        Curate units based on firing rate. Units with firing rate below FR_MIN are not curated.
+        Curate units based on firing rate. Units with firing rate below fr_thresh are not curated.
 
         Parameters
         ----------
@@ -1495,7 +1495,7 @@ class CurationMetrics:
         Returns
         -------
         curated_ids : np.array
-            Array containing the curated units that are above firing rate threshold (FR_MIN)
+            Array containing the curated units that are above firing rate threshold (fr_thresh)
         """
         fs = recording.get_sampling_frequency()
 
@@ -1523,7 +1523,7 @@ class CurationMetrics:
     @staticmethod
     def curate_isi_violations(recording, sorting, isi_threshold_ms=1.5, min_isi_ms=0, **kwargs):
         """
-        Curate units based on ISI violations. Units with violations greater than ISI_VIOL_MAX are
+        Curate units based on ISI violations. Units with violations greater than isi_viol_thresh are
         removed from curation
 
         It computes several metrics related to isi violations:
@@ -1646,7 +1646,7 @@ class CurationMetrics:
         if return_scaled_corrected:
             # Check if recording has scaled values:
             if not recording.has_scaled_traces():
-                print("Setting 'RETURN_SCALED' to False")
+                print("Setting 'return_scaled' to False")
                 return_scaled_corrected = False
 
         print("Extracting noise levels from recording")
@@ -2199,10 +2199,10 @@ class Utils:
 
         Flexible chunk_size setter with 3 ways:
             * "chunk_size": is the length in sample for each chunk independently of channel count and dtype.
-            * "CHUNK_MEMORY": total memory per chunk per worker
-            * "TOTAL_MEMORY": total memory over all workers.
+            * "chunk_memory": total memory per chunk per worker
+            * "total_memory": total memory over all workers.
 
-        If chunk_size/CHUNK_MEMORY/TOTAL_MEMORY are all None then there is no chunk computing
+        If chunk_size/chunk_memory/total_memory are all None then there is no chunk computing
         and the full trace is retrieved at once.
 
         Parameters
@@ -2237,7 +2237,7 @@ class Utils:
                 # not chunk computing
                 chunk_size = None
             else:
-                raise ValueError('For N_JOBS >1 you must specify TOTAL_MEMORY or chunk_size or CHUNK_MEMORY')
+                raise ValueError('For n_jobs >1 you must specify total_memory or chunk_size or chunk_memory')
 
         return chunk_size
 
@@ -2287,7 +2287,7 @@ class ChunkRecordingExecutor:
     chunk_memory: str
         Memory per chunk (RAM) to use (e.g. "1G", "500M")
     chunk_size: int or None
-        Size of each chunk in number of samples. If 'TOTAL_MEMORY' or 'CHUNK_MEMORY' are used, it is ignored.
+        Size of each chunk in number of samples. If 'total_memory' or 'chunk_memory' are used, it is ignored.
     job_name: str
         Job name
 
@@ -2318,7 +2318,7 @@ class ChunkRecordingExecutor:
         self.job_name = job_name
 
         if verbose:
-            print(self.job_name, 'with', 'N_JOBS', self.n_jobs, ' chunk_size', self.chunk_size)
+            print(self.job_name, 'with', 'n_jobs', self.n_jobs, ' chunk_size', self.chunk_size)
 
     def run(self):
         """
@@ -2395,7 +2395,7 @@ class WorkerChunk:
         selected_spike_times = worker_ctx['selected_spike_times']
         nbefore = worker_ctx['nbefore']
         nafter = worker_ctx['nafter']
-        return_scaled = worker_ctx['RETURN_SCALED']
+        return_scaled = worker_ctx['return_scaled']
         unit_cum_sum = worker_ctx['unit_cum_sum']
 
         seg_size = recording.get_num_samples(segment_index=segment_index)
@@ -2463,7 +2463,7 @@ class WorkerChunk:
         worker_ctx['selected_spike_times'] = selected_spike_times
         worker_ctx['nbefore'] = nbefore
         worker_ctx['nafter'] = nafter
-        worker_ctx['RETURN_SCALED'] = return_scaled
+        worker_ctx['return_scaled'] = return_scaled
 
         num_seg = sorting.get_num_segments()
         unit_cum_sum = {}
@@ -3421,14 +3421,14 @@ def extract_waveforms(recording, sorting, folder, load_if_exists=False, precompu
         and recomputed.
     precompute_template: None or list
         Precompute average/std/median for template. If None not precompute.
-    WAVEFORMS_MS_BEFORE: float
+    ms_before: float
         Time in ms to cut before spike peak
-    WAVEFORMS_MS_AFTER: float
+    ms_after: float
         Time in ms to cut after spike peak
     max_spikes_per_unit: int or None
         Number of spikes per unit to extract waveforms from (default 500).
         Use None to extract waveforms for all spikes
-    RETURN_SCALED: bool
+    return_scaled: bool
         If True and recording has gain_to_uV/offset_to_uV properties, waveforms are converted to uV.
     dtype: dtype or None
         Dtype of the output waveforms. If None, the recording dtype is maintained.
@@ -3486,7 +3486,7 @@ def curate_units(recording, sorting, cache_folder):
         return
 
     if not auto_curate:
-        print("\nAUTO_CURATE is set to False, so skipping data curation.")
+        print("\nauto_curate is set to False, so skipping data curation.")
         return
 
     print(f'N units before curation: {len(sorting.unit_ids)}')
@@ -3531,27 +3531,27 @@ def curate_units(recording, sorting, cache_folder):
     # print(f'N units before curation: {len(sorting.unit_ids)}')
     #
     # # Curation based on firing rate
-    # if FR_MIN is not None:
+    # if fr_thresh is not None:
     #     print(f"Curation based on firing rate")
-    #     fr_query = f"firing_rate > {FR_MIN}"
+    #     fr_query = f"firing_rate > {fr_thresh}"
     #     waveforms_curated = waveforms_curated.query(fr_query)
     #     print(f'N units after num spikes curation: {len(waveforms_curated)}\n')
     #
     # # Curation based on interspike-interval-violation
-    # if ISI_VIOL_MAX is not None:
+    # if isi_viol_thresh is not None:
     #     if len(waveforms_curated) > 0:
     #         print(f"Curation based on isi violation ratio")
-    #         isi_query = f"isi_violations_rate < {ISI_VIOL_MAX}"
+    #         isi_query = f"isi_violations_rate < {isi_viol_thresh}"
     #         waveforms_curated = waveforms_curated.query(isi_query)
     #         print(f'N units after ISI curation: {len(waveforms_curated)}\n')
     #     else:
     #         print("No units remain after curation")
     #
     # # Curation based on signal-to-noise ratio
-    # if SNR_MIN is not None:
+    # if snr_thresh is not None:
     #     if len(waveforms_curated) > 0:
     #         print(f"Curation based on SNR")
-    #         snr_query = f"snr > {SNR_MIN}"
+    #         snr_query = f"snr > {snr_thresh}"
     #         waveforms_curated = waveforms_curated.query(snr_query)
     #         print(f'N units after SNR curation: {len(waveforms_curated)}\n')
     #     else:
