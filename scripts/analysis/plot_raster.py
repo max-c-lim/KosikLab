@@ -57,7 +57,7 @@ def plot_raster_old(mat, subplot: axes.Axes, random_time=False, time_start=None,
         return time_start, time_end
 
 
-def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, time_end=None, title=None):
+def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, time_end=None, use_ms=False, title=None):
     """
     Create a raster plot of the units from .mat file
 
@@ -73,7 +73,10 @@ def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, tim
         Starting time
     time_end
         Ending time
+    use_ms: bool
+        If True, for x-axis, use real time (ms) instead of samples
     title: string
+        Title of plot
     """
 
     if random_time:
@@ -82,14 +85,25 @@ def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, tim
         time_start = np.random.randint(time_max+1)
         time_end = time_start + window_size
 
-    spike_trains = mat.get_spike_trains(time_start=time_start, time_end=time_end)
+    if use_ms:
+        sampling_frequency = mat.get_sampling_frequency()
+    else:
+        sampling_frequency = None
+
+    spike_trains = mat.get_spike_trains(time_start=time_start, time_end=time_end, sampling_frequency=sampling_frequency)
     spike_trains = [train for train in spike_trains if len(train) > 0]  # Some units are not active in window
+
     for i, st in enumerate(spike_trains):
-        subplot.plot(st, np.ones_like(st)*i, marker='|', mew=1, markersize=3,
-                             ls='')
+        subplot.plot(st, np.ones_like(st)*i, marker='.', markersize=2,
+                     ls='')
     subplot.set_title(title)
     subplot.set_ylim(0.5, len(spike_trains))
-    subplot.set_xlabel(f"Time (samples, {mat.get_sampling_frequency()} Hz)")
+
+    if use_ms:
+        xlabel = f"Time (ms)"
+    else:
+        xlabel = f"Time (samples, {mat.get_sampling_frequency()} Hz)"
+    subplot.set_xlabel(xlabel)
     subplot.set_ylabel("Units")
 
     if random_time:
@@ -97,23 +111,10 @@ def plot_raster(mat, subplot: axes.Axes, random_time=False, time_start=None, tim
 
 
 def main():
-    # Directory of .mat files
-    root_path = "./data/maxone/"
-    path_tj = root_path + "tj/"
-    path_mx = root_path + "mx/"
-
-    # .mat files
-    rec_num = 2950
-    path_mat_tj = path_tj + f"{rec_num}_sorted.mat"
-    path_mat_mx = "./data/maxone/mx/0uM_sorted.mat"
-    # path_mat_mx = path_mx + f"{rec_num}_sorted.mat"
-
-    # MatExtractors
     mat = MatExtractor("data/maxone_2953_sorted.mat")
-    print(mat.get_sampling_frequency())
-    fig, (a0, a1) = plt.subplots(2)
-    time_start, time_end = plot_raster_old(mat, a0, random_time=True)
-    plot_raster(mat, a1, time_start=time_start, time_end=time_end)
+
+    fig, a0 = plt.subplots(1)
+    time_start, time_end = plot_raster(mat, a0, random_time=True, use_ms=True)
     plt.show()
 
 

@@ -68,26 +68,29 @@ class MatExtractor:
             ids.append(unit.get_id())
         return ids
 
-    def get_spike_trains(self, time_start=None, time_end=None):
+    def get_spike_trains(self, time_start=None, time_end=None, sampling_frequency=None):
         """
         Get spike trains of the mat file
 
-        :param time_start:
+        Parameters
+        ----------
+        time_start
             If not None, exclude spikes that come before
-        :param time_end:
+        time_end
             If not None, exclude spikes that come after
+        sampling_frequency
+            If not None, convert spike times in samples to ms
 
-        :return:
+        Returns
+        -------
         A list of numpy arrays that contain spike trains
         """
         units = self.units
 
         spike_trains = []
         for unit in units:
-            unit_spike_train = unit.get_spike_train(time_start=time_start, time_end=time_end)
-
+            unit_spike_train = unit.get_spike_train(time_start=time_start, time_end=time_end, sampling_frequency=sampling_frequency)
             spike_trains.append(unit_spike_train)
-
         return spike_trains
 
 
@@ -99,7 +102,7 @@ class Unit:
     def __init__(self, units_raw, index):
         self.dict = units_raw[index][0][0]
 
-    def get_spike_train(self, time_start=None, time_end=None):
+    def get_spike_train(self, time_start=None, time_end=None, sampling_frequency=None):
         # Get the spike times of the unit
 
         spike_train = self.dict["spike_train"][0]
@@ -109,6 +112,11 @@ class Unit:
         if time_end is not None:
             indices = np.nonzero(spike_train <= time_end)
             spike_train = spike_train[indices]
+
+        if sampling_frequency is not None:
+            # Convert spike times in samples to ms
+            spike_train = spike_train / sampling_frequency * 1000
+
         return spike_train
 
     def get_x_max(self):
@@ -204,6 +212,7 @@ def find_similar_units(mat_extractor1, mat_extractor2):
 def main():
     mat = MatExtractor("data/maxone_2953_sorted.mat")
     print(mat.get_channel_locations().shape)
+
 
 if __name__ == "__main__":
     main()
