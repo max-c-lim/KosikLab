@@ -43,47 +43,71 @@ def get_electrode_data(mat, size_scale=1):
             loc_x.append(loc[0])
             loc_y.append(loc[1])
 
+    for _ in range(10):
+        print("FLIPPING Y-VALUES")
+    y_max = max(loc_y)
+    loc_y = [y_max - y for y in loc_y]
+
     return loc_x, loc_y, list(loc_sizes.values())
 
 
 def main():
     # plt.rcParams["font.family"] = "Times New Roman"
-
-    # Directory of .mat files
-    data_path = "/Users/maxlim/KosikLab/data/maxone/"
-    # MatExtractors
-    rec_num = 2953
-    # mat_tj = MatExtractor(data_path + f"tj/{rec_num}_sorted.mat")
-    # mat_mx = MatExtractor(data_path + f"mx/{rec_num}_sorted.mat")
-    mat_tj = MatExtractor("data/maxone_2953_sorted.mat")
-    mat_mx = MatExtractor("data/maxone_2953_sorted.mat")
+    mat = MatExtractor("data/maxone_2953_sorted.mat")
 
     # Plotting Electrodes
     size_scale = 1
-    electrode_data_tj = get_electrode_data(mat_tj, size_scale=size_scale)
-    electrode_data_mx = get_electrode_data(mat_mx, size_scale=size_scale)
+    electrode_data = get_electrode_data(mat, size_scale=size_scale)
 
-    # Single plot
-    alpha = 0.7
-    fig, ax = plt.subplots(1)  # type:figure.Figure, axes.Axes
-    fig.suptitle(f"Electrode Plots of {rec_num}")
-    fig.supxlabel("x (μm)")
-    fig.supylabel("y (μm)")
-    fig.canvas.manager.set_window_title(f"{rec_num}_electrode_plots")
+    fig, ((a00, a01), (a10, a11)) = plt.subplots(2, 2)  # type:figure.Figure, ((axes.Axes, axes.Axes), (axes.Axes, axes.Axes))
+    fig.delaxes(a10)
+    fig.suptitle(f"Electrode Plots")
+    fig.canvas.manager.set_window_title(f"electrode_plots")
 
-    locations_all = (*electrode_data_tj[0], *electrode_data_tj[1], *electrode_data_mx[0], *electrode_data_mx[1])
-    lim_max = max(locations_all)
-    ax.set_aspect("equal")
-    buffer = 200
-    ax.set_xlim(-buffer, lim_max+buffer)
-    ax.set_ylim(-buffer, lim_max+buffer)
+    # Plot probe
+    channel_locations = mat.get_channel_locations()
+    n_channels = channel_locations.shape[0]
+    channel_dot_size = 1
 
-    loc_off_screen = (-1e8, -1e8)
-    size1000 = ax.scatter(*loc_off_screen, size_scale * 1000, c="#000000")
-    legend_sizes = ax.legend((size1000,),
-                               ("1000 spikes",),
-                               loc="upper right")
-    ax.scatter(*electrode_data_mx, c="#0000FF", alpha=alpha)
+    for _ in range(10):
+        print("FLIPPING Y-VALUES")
+    y_flipped = max(channel_locations[:, 1])-channel_locations[:, 1]
+
+    a00.scatter(channel_locations[:, 0], y_flipped, [channel_dot_size]*n_channels, c="#000000")
+    a00.set_title(f"Recording Probe - {n_channels} channels")
+    a00.set_xlabel("x (μm)")
+    a00.set_ylabel("y (μm)")
+    a00.set_aspect("equal")
+    lim_buffer = 100
+    a00.set_xlim(-lim_buffer, max(*electrode_data[0])+lim_buffer)
+    a00.set_ylim(-lim_buffer, max(*electrode_data[1])+lim_buffer)
+
+    # Plot Units' Locations
+    spike_color = "#0000FF"
+    spike_alpha = 0.7
+    a01.scatter(*electrode_data, c=spike_color, alpha=spike_alpha)
+    a01.set_title(f"Spike Locations")
+    a01.set_xlabel(a00.get_xlabel())
+    a01.set_ylabel(a00.get_xlabel())
+    a01.set_aspect("equal")
+    a01.set_xlim(*a00.get_xlim())
+    a01.set_ylim(*a00.get_ylim())
+
+    # Plot Size Legend
+    loc_off_screen = (-1, -1)
+    a11.set_xlim(0, 0.1)
+    a11.set_ylim(0, 0.1)
+    sizes_kwargs = {"color": spike_color, "alpha": spike_alpha}
+
+    # Area scales linearly
+    size100 = a11.scatter(*loc_off_screen, size_scale * 100, **sizes_kwargs)
+    size500 = a11.scatter(*loc_off_screen, size_scale * 500, **sizes_kwargs)
+    size1000 = a11.scatter(*loc_off_screen, size_scale * 1000, **sizes_kwargs)
+
+    a11.legend((size100, size500, size1000), ("100 spikes", "500 spikes", "1000 spikes"),
+              loc="center",
+              labelspacing=2,
+              borderpad=1)
     plt.show()
 
 

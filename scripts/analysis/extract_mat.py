@@ -23,6 +23,10 @@ class MatExtractor:
     def get_sampling_frequency(self):
         return self.dict["fs"].squeeze()
 
+    def get_channel_locations(self):
+        # Each row is the (x, y) of a channel
+        return self.dict["locations"]
+
     def _get_units_raw(self):
         # Returns array of units in struct form (raw form from scipy)
         return self.dict["units"][0]
@@ -198,9 +202,8 @@ def find_similar_units(mat_extractor1, mat_extractor2):
 
 
 def main():
-    mat = MatExtractor("data/float32/float32_maxone_2953_sorted.mat")
-    unit = mat.get_unit(195)
-    print(unit.get_spike_train())
+    mat = MatExtractor("data/maxone_2953_sorted.mat")
+    print(mat.get_channel_locations().shape)
 
 if __name__ == "__main__":
     main()

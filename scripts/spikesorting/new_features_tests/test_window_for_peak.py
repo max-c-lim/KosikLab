@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-TEMPLATES_PATH = "/Users/maxlim/KosikLab/scripts/analysis/data/float32/templates.npy"
+TEMPLATES_PATH = r"E:\KosikLab\code\scripts\analysis\data\templates.npy"
 
 # If the positive peak of the waveform or template is POS_PEAK_THRESH times as large as
 # the absolute value of negative peak, the positive peak is used for centering the waveform, amplitude,
@@ -44,13 +44,16 @@ for i in range(templates_all.shape[0]):
 
     template_mid = template.size//2
     left_cut_ind = np.flatnonzero(np.isclose(template[:template_mid], 0))[-1]
+
+    left_cut_ind = (template_mid - left_cut_ind) + (template_mid-left_cut_ind)/0.75
+
     right_cut_ind = template.size-1 - left_cut_ind
 
     plt.plot(template)
     plt.axvline(left_cut_ind, color="#000000", linestyle="dashed", label="Window Bounds")
     plt.axvline(right_cut_ind, color="#000000", linestyle="dashed")
 
-    half_window_size = template_mid - np.flatnonzero(np.isclose(template[:template_mid], 0))[-1]
+    half_window_size = (template_mid - np.flatnonzero(np.isclose(template[:template_mid], 0))[-1])
     window_left = max(template_mid - half_window_size, 0)
     window_right = min(template_mid + half_window_size, template.size)
     window = slice(window_left, window_right)
