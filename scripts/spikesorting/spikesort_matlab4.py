@@ -15,7 +15,7 @@ RECORDING_FILES = [
 # List of intermediate folders where Kilosort2 sorting results, waveforms, and graphs are saved
 INTERMEDIATE_FOLDERS = [
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2950",
-    "/home/maxlim/SpikeSorting/data/test/220604/maxone_2953",
+    "/home/maxlim/SpikeSorting/data/test/220606/maxone_2953/new_features_test",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2953",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2954",
     # "/home/maxlim/SpikeSorting/data/DL/sorted/processed/maxone_2957",
@@ -26,7 +26,7 @@ INTERMEDIATE_FOLDERS = [
 # List of output folders where final matlab files are saved.
 # Matlab files will have the same name as recording files but will end with _sorted.mat
 MATLAB_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/test/220604/maxone_2953",
+    "/home/maxlim/SpikeSorting/data/test/220606/maxone_2953/new_features_test",
     # "/home/maxlim/SpikeSorting/data/test/220601/maxone_2953/float32_3_curation",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
     # "/home/maxlim/SpikeSorting/data/DL/sorted",
@@ -64,7 +64,7 @@ KILOSORT_PARAMS = {
     'car': True,
     'minFR': 0.1,
     'minfr_goodchannels': 0.1,
-    'FREQ_MIN': 150,
+    'freq_min': 150,
     'sigmaMask': 30,
     'nPCs': 3,
     'ntbuff': 64,
@@ -97,11 +97,9 @@ SAVE_SCRIPT = True
 ######################################################
 # N_JOBS and TOTAL_MEMORY affects how bandpass filter is applied to raw recording, causing different .dat file
 # Number of jobs to use for converting raw recording, extracting waveforms, and curation
-N_JOBS = 16
-# RAM for each chunk for applying bandpass filter and converting .raw.h5 to .dat
-CHUNK_MEMORY = "1000G"
+N_JOBS = 1
 # Total RAM to use for converting raw extracting waveforms and curation
-TOTAL_MEMORY = "10G"
+TOTAL_MEMORY = "1G"
 
 ######################################################
 ############  BANDPASS FILTER PARAMETERS  ############
@@ -115,6 +113,10 @@ FREQ_MAX = 6000
 # ms before and after waveform trough (negative peak) to extract
 WAVEFORMS_MS_BEFORE = 5.
 WAVEFORMS_MS_AFTER = 5.
+# If the positive peak of the waveform or template is POS_PEAK_THRESH times as large as
+# the absolute value of negative peak, the positive peak is used for centering the waveform, amplitude,
+# and finding the max channel. Otherwise, the negative peak is used
+POS_PEAK_THRESH = 2
 # If True and recording has gain_to_uV/offset_to_uV properties, waveforms are converted to uV
 RETURN_SCALED = True
 # Maximum number of waveforms (spikes) per unit to compute templates and extract (None-> all spikes are used)
@@ -204,7 +206,7 @@ import numpy as np
 
 import spikeinterface.core.segmentutils as si_segmentutils
 from spikeinterface.extractors import BinaryRecordingExtractor
-
+import matplotlib.pyplot as plt
 import subprocess
 import tempfile
 import shutil
@@ -244,7 +246,7 @@ class RunKilosort:
         self.start_sorting(output_folder, raise_error=True, verbose=True)
 
         # STEP 3) Return results of Kilosort as Python object for auto curation
-        return RunKilosort.get_result_from_folder(output_folder)
+        return RunKilosort.get_result_from_folder(output_folder, recording)
 
     def setup_recording_files(self, recording, recording_dat_path, output_folder):
         # Prepare electrode positions for this group (only one group, the split is done in spikeinterface's basesorter)
@@ -318,7 +320,7 @@ class RunKilosort:
         ops.chanMap             = fullfile('chanMap.mat'); % make this file using createChannelMapFile.m
 
         % frequency for high pass filtering (150)
-        ops.fshigh = {FREQ_MIN};
+        ops.fshigh = {freq_min};
 
         % minimum firing rate on a "good" channel (0 to skip)
         ops.minfr_goodchannels = {minfr_goodchannels};
@@ -393,7 +395,7 @@ class RunKilosort:
             preclust_threshold=KILOSORT_PARAMS['preclust_threshold'],
             minfr_goodchannels=KILOSORT_PARAMS['minfr_goodchannels'],
             minFR=KILOSORT_PARAMS['minFR'],
-            freq_min=KILOSORT_PARAMS['FREQ_MIN'],
+            freq_min=KILOSORT_PARAMS['freq_min'],
             sigmaMask=KILOSORT_PARAMS['sigmaMask'],
             kilo_thresh=KILOSORT_PARAMS['detect_threshold'],
             use_car=KILOSORT_PARAMS['car'],
@@ -630,8 +632,8 @@ end'''
             KILOSORT_PARAMS['car'] = 0
 
     @classmethod
-    def get_result_from_folder(cls, output_folder):
-        return KilosortSortingExtractor(folder_path=output_folder, keep_good_only=KILOSORT_PARAMS["keep_good_only"])
+    def get_result_from_folder(cls, output_folder, recording):
+        return KilosortSortingExtractor(folder_path=output_folder, recording=recording)
 
 
 class KilosortSortingExtractor:
@@ -642,28 +644,23 @@ class KilosortSortingExtractor:
     ----------
     folder_path: str or Path
         Path to the output Phy folder (containing the params.py which stores data about the raw recording)
+    recording:
+        The recording extractor to get traces from to center waveforms on peak
     exclude_cluster_groups: list or str (optional)
         Cluster groups to exclude (e.g. "noise" or ["noise", "mua"])
     """
 
-    extractor_name = 'BasePhyKilosortSorting'
-    installed = False  # check at class level if installed or not
-    is_writable = False
-    is_dumpable = True
-    mode = 'folder'
-
-    def __init__(self, folder_path, exclude_cluster_groups=None, keep_good_only=False):
+    def __init__(self, folder_path, recording, exclude_cluster_groups=None):
         # Folder containing the numpy results of Kilosort
         phy_folder = Path(folder_path)
         self.folder = phy_folder.absolute()
 
-        spike_times = np.load(str(phy_folder / 'spike_times.npy'))
-        spike_clusters = np.load(str(phy_folder / 'spike_clusters.npy'))
+        self.spike_times = np.atleast_1d(np.load(str(phy_folder / 'spike_times.npy')).astype(int).flatten())
+        self.spike_clusters = np.atleast_1d(np.load(str(phy_folder / 'spike_clusters.npy')).flatten())
 
         # The unit_ids with at least 1 spike
-        unit_ids_with_spike = set(spike_clusters.flatten())
+        unit_ids_with_spike = set(self.spike_clusters)
 
-        spike_times.astype(int)
         params = Utils.read_python(str(phy_folder / 'params.py'))
         self.sampling_frequency = params['sample_rate']
 
@@ -705,16 +702,8 @@ class KilosortSortingExtractor:
                     for exclude_group in exclude_cluster_groups:
                         cluster_info = cluster_info.query(f"group != '{exclude_group}'")
 
-        if keep_good_only and "KSLabel" in cluster_info.columns:
+        if KILOSORT_PARAMS["keep_good_only"] and "KSLabel" in cluster_info.columns:
             cluster_info = cluster_info.query("KSLabel == 'good'")
-
-        self._sorting_segments = []
-        self.add_sorting_segment(KilosortSortingSegment(spike_times, spike_clusters))
-        self._all_spikes = spike_times
-        self._all_clusters = spike_clusters
-
-        self._kwargs = {'folder_path': str(Path(folder_path).absolute()),
-                        'keep_good_only': keep_good_only}
 
         all_unit_ids = cluster_info["cluster_id"].values
         self.unit_ids = []
@@ -727,12 +716,10 @@ class KilosortSortingExtractor:
         # Returns the index of the waveform unit id in the stored list
         return list(self.unit_ids).index(id)
 
-    def get_num_segments(self):
-        return len(self._sorting_segments)
-
-    def add_sorting_segment(self, sorting_segment):
-        self._sorting_segments.append(sorting_segment)
-        sorting_segment.set_parent_extractor(self)
+    @staticmethod
+    def get_num_segments():
+        # Sorting should always have 1 segment
+        return 1
 
     def get_unit_spike_train(self,
                              unit_id,
@@ -740,20 +727,42 @@ class KilosortSortingExtractor:
                              start_frame: Union[int, None] = None,
                              end_frame: Union[int, None] = None,
                              ):
-        if segment_index is None:
-            if self.get_num_segments() == 1:
-                segment_index = 0
-            else:
-                raise ValueError()
+        spike_times = self.spike_times[self.spike_clusters == unit_id]
+        if start_frame is not None:
+            spike_times = spike_times[spike_times >= start_frame]
+        if end_frame is not None:
+            spike_times = spike_times[spike_times < end_frame]
 
-        segment = self._sorting_segments[segment_index]
+        return np.atleast_1d(spike_times.copy().squeeze())
 
-        spike_train = segment.get_unit_spike_train(
-            unit_id=unit_id, start_frame=start_frame, end_frame=end_frame).astype("int64")
+    def get_templates_all(self):
+        # Returns Kilosort2's outputted templates as mmap np.array
+        return np.load(str(self.folder / "templates.npy"), mmap_mode="r")
 
-        # np.atleast_1d is because caller expects iterable array
-        return np.atleast_1d(spike_train)
+    def get_channel_map(self):
+        # Returns Kilosort2's channel map as mmap np.array
+        return np.load(str(self.folder / "channel_map.npy"), mmap_mode="r").squeeze()
 
+    def get_chans_max(self):
+        # Get the max channel of each unit based on Kilosort2's template
+        # and whether to use (min/argmin or max/argmax) for computing peak values
+        # Returned arrays will have shape (n_units,)
+
+        templates_all = self.get_templates_all()
+
+        chans_neg_peaks_values = np.min(templates_all, axis=1)
+        chans_neg_peaks_indices = chans_neg_peaks_values.argmin(axis=1)
+        chans_neg_peaks_values = np.min(chans_neg_peaks_values, axis=1)
+
+        chans_pos_peaks_values = np.max(templates_all, axis=1)
+        chans_pos_peaks_indices = chans_pos_peaks_values.argmax(axis=1)
+        chans_pos_peaks_values = np.max(chans_pos_peaks_values, axis=1)
+
+        use_pos_peak = chans_pos_peaks_values >= POS_PEAK_THRESH * np.abs(chans_neg_peaks_values)
+        kilosort_chans_max = np.where(use_pos_peak, chans_pos_peaks_indices, chans_neg_peaks_indices)
+        chans_max = self.get_channel_map()[kilosort_chans_max]
+
+        return use_pos_peak, kilosort_chans_max, chans_max
 
 class ShellScript:
     """
@@ -944,41 +953,6 @@ class ShellScript:
                     time.sleep(delay_between_tries)
                 else:
                     raise Exception('Unable to remove directory after {} tries: {}'.format(num_retries, dirname))
-# region Sorting Segments
-class BaseSegment:
-    """
-    A segment of a recording or sorting output
-    Needed to create weak references for garbage collection
-    """
-
-    def __init__(self):
-        self._parent_extractor = None
-
-    @property
-    def parent_extractor(self):
-        return self._parent_extractor()
-
-    def set_parent_extractor(self, parent_extractor):
-        self._parent_extractor = weakref.ref(parent_extractor)
-
-
-class KilosortSortingSegment(BaseSegment):
-    """
-    A segment of the kilosort output
-    """
-    def __init__(self, all_spikes, all_clusters):
-        BaseSegment.__init__(self)
-        self._all_spikes = all_spikes
-        self._all_clusters = all_clusters
-
-    def get_unit_spike_train(self, unit_id, start_frame, end_frame):
-        spike_times = self._all_spikes[self._all_clusters == unit_id]
-        if start_frame is not None:
-            spike_times = spike_times[spike_times >= start_frame]
-        if end_frame is not None:
-            spike_times = spike_times[spike_times < end_frame]
-        return np.atleast_1d(spike_times.copy().squeeze())
-# endregion
 # endregion
 
 
@@ -1005,6 +979,7 @@ class WaveformExtractor:
         self.template_cache = {}
         self._extremum_amplitudes = None
         self._extremum_channels_indices = None
+        self.use_pos_peak, self.kilosort_chans_max, self.chans_max_all = self.sorting.get_chans_max()
 
         # Set Parameters
         self.nbefore = self.ms_to_samples(WAVEFORMS_MS_BEFORE)  # Number of samples before waveform peak to include
@@ -1034,6 +1009,7 @@ class WaveformExtractor:
         # Create new waveform extractor
         folder = Path(folder)
         create_folder(folder / 'waveforms')
+        print()
         return cls(recording, sorting, folder)
 
     @classmethod
@@ -1055,9 +1031,52 @@ class WaveformExtractor:
     # endregion
 
     # region Extract waveforms
+    def center_spike_times_on_peak(self):
+        """
+        Center self.sorting.spike_times based on the peak within the template window
+        """
+
+        kilosort_chans_max = self.kilosort_chans_max
+        templates_all = self.sorting.get_templates_all()
+        templates_all_max = templates_all[np.arange(kilosort_chans_max.size), :, kilosort_chans_max]
+        template_mid = templates_all_max.shape[1]
+
+        use_pos_peak = self.use_pos_peak
+        chans_max_all = self.chans_max_all
+
+        traces_all = self.recording.get_traces()
+        max_trace_ind = traces_all.shape[0] - 1
+
+        for unit_id in self.sorting.unit_ids[400:405]:
+            template = templates_all_max[unit_id, :]
+            half_window_size = template_mid - np.flatnonzero(np.isclose(template[:template_mid], 0))[-1]
+
+            spike_times_ind = np.flatnonzero(self.sorting.spike_clusters == unit_id)
+            for st_ind in spike_times_ind:
+                st = self.sorting.spike_times[st_ind]
+                window_left = max(st - half_window_size, 0)
+                window_right = min(st + half_window_size, max_trace_ind)
+                traces = traces_all[window_left:window_right, chans_max_all[unit_id]]
+
+                if use_pos_peak[unit_id]:
+                    peak_value = np.max(traces)
+                else:
+                    peak_value = np.min(traces)
+
+                peak_indices = np.flatnonzero(traces == peak_value)
+                st_offset = peak_indices[peak_indices.size//2] - (window_right-window_left+1)//2
+                self.sorting.spike_times[st_ind] += st_offset
+
+                test = traces_all[self.sorting.spike_times[st_ind]-100:self.sorting.spike_times[st_ind]+100, chans_max_all[unit_id]]
+                plt.plot(test)
+            plt.axvline(100)
+            plt.savefig(f"/home/maxlim/SpikeSorting/scripts/old_waves/{unit_id}.png")
+            plt.cla()
+        exit()
+
     def run_extract_waveforms(self, **job_kwargs):
         num_chans = self.recording.get_num_channels()
-        job_kwargs["N_JOBS"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('N_JOBS', None))
+        job_kwargs["n_jobs"] = Utils.ensure_n_jobs(self.recording, job_kwargs.get('n_jobs', None))
 
         selected_spikes = self.sample_spikes()
 
@@ -1070,7 +1089,7 @@ class WaveformExtractor:
                 sel = selected_spikes[unit_id][segment_index]
                 selected_spike_times[unit_id].append(spike_times[sel])
 
-        # prepare memmap
+        # Prepare memmap
         print("Preparing memory maps for waveforms")
         wfs_memmap = {}
         for unit_id in self.sorting.unit_ids:
@@ -1082,14 +1101,11 @@ class WaveformExtractor:
             # wfs = np.load(file_path, mmap_mode='r+')
             wfs_memmap[unit_id] = file_path
 
-        # and run
+        # Run extract waveforms
         func = WaveformExtractor._waveform_extractor_chunk
         init_func = WaveformExtractor._init_worker_waveform_extractor
 
-        init_args = (self.recording, self.sorting,)
-        # endregion
-
-        init_args = init_args + (wfs_memmap, selected_spikes, selected_spike_times, self.nbefore, self.nafter, self.return_scaled)
+        init_args = (self.recording, self.sorting, wfs_memmap, selected_spikes, selected_spike_times, self.nbefore, self.nafter, self.return_scaled)
         processor = ChunkRecordingExecutor(self.recording, func, init_func, init_args, job_name='extract waveforms',
                                            **job_kwargs)
         processor.run()
@@ -1182,7 +1198,7 @@ class WaveformExtractor:
         selected_spike_times = worker_ctx['selected_spike_times']
         nbefore = worker_ctx['nbefore']
         nafter = worker_ctx['nafter']
-        return_scaled = worker_ctx['RETURN_SCALED']
+        return_scaled = worker_ctx['return_scaled']
         unit_cum_sum = worker_ctx['unit_cum_sum']
 
         seg_size = recording.get_num_samples(segment_index=segment_index)
@@ -1238,7 +1254,7 @@ class WaveformExtractor:
         worker_ctx['selected_spike_times'] = selected_spike_times
         worker_ctx['nbefore'] = nbefore
         worker_ctx['nafter'] = nafter
-        worker_ctx['RETURN_SCALED'] = return_scaled
+        worker_ctx['return_scaled'] = return_scaled
 
         num_seg = sorting.get_num_segments()
         unit_cum_sum = {}
@@ -1324,7 +1340,7 @@ class WaveformExtractor:
             sampled_index_without_segment_index.append(index[0])
         return sampled_index_without_segment_index
 
-    def get_template(self, unit_id, mode='average'):
+    def get_computed_template(self, unit_id, mode='average'):
         """
         Return template (average waveform).
 
@@ -1437,7 +1453,7 @@ class WaveformExtractor:
 
         peak_values = {}
         for unit_id in self.sorting.unit_ids:
-            template = self.get_template(unit_id, mode='average')
+            template = self.get_computed_template(unit_id, mode='average')
 
             if peak_sign == 'both':
                 values = np.max(np.abs(template), axis=0)
@@ -1633,7 +1649,7 @@ class ChunkRecordingExecutor:
         self.job_name = job_name
 
         if verbose:
-            print(self.job_name, 'with', 'N_JOBS', self.n_jobs, ' chunk_size', self.chunk_size)
+            print(self.job_name, 'with', 'n_jobs', self.n_jobs, ' chunk_size', self.chunk_size)
 
     def run(self):
         """
@@ -2785,10 +2801,10 @@ class Utils:
 
         Flexible chunk_size setter with 3 ways:
             * "chunk_size": is the length in sample for each chunk independently of channel count and dtype.
-            * "CHUNK_MEMORY": total memory per chunk per worker
-            * "TOTAL_MEMORY": total memory over all workers.
+            * "chunk_memory": total memory per chunk per worker
+            * "total_memory": total memory over all workers.
 
-        If chunk_size/CHUNK_MEMORY/TOTAL_MEMORY are all None then there is no chunk computing
+        If chunk_size/chunk_memory/total_memory are all None then there is no chunk computing
         and the full trace is retrieved at once.
 
         Parameters
@@ -2841,7 +2857,7 @@ class Utils:
 
 # region spikesort_matlab.py
 class Stopwatch:
-    def __init__(self, start_msg=None, use_print_stage=False):
+    def __init__(self, start_msg=None, use_print_stage=True):
         if start_msg is not None:
             if use_print_stage:
                 print_stage(start_msg)
@@ -2901,12 +2917,14 @@ def concatenate_recordings(rec_path):
 def get_paths(rec_path, inter_path):
 
     rec_path = Path(rec_path)
+    rec_name = rec_path.name.split(".")[0]
     print_stage("PROCESSING RECORDING")
     print(f"Recording path: {rec_path}")
 
     inter_path = Path(inter_path)
 
-    recording_dat_path = inter_path / (rec_path.name.split(".")[0] + "_filtered.dat")
+    recording_dat_path = inter_path / (rec_name + "_filtered.dat")
+    recording_saved_path = inter_path / (rec_name + "_filtered")
     output_folder = inter_path / 'kilosort2_results'
     waveforms_folder = inter_path / 'waveforms'
     waveforms_raw_folder = waveforms_folder / 'waveforms_raw'
@@ -2927,30 +2945,32 @@ def get_paths(rec_path, inter_path):
             print(f"Deleted folder: {folder}")
 
     create_folder(inter_path)
-    return rec_path, inter_path, recording_dat_path, output_folder, waveforms_raw_folder, waveforms_curated_folder
+    return rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_raw_folder, waveforms_curated_folder
 
 
-def write_recording(recording, recording_dat_path, verbose=True):
-    print_stage("WRITING BINARY RECORDING")
-    stopwatch = Stopwatch()
+def write_recording(recording, recording_saved_path, recording_dat_path, verbose=True):
+    stopwatch = Stopwatch(start_msg="WRITING RECORDING", use_print_stage=True)
+    job_kwargs = {"progress_bar": verbose, "verbose": verbose, "n_jobs": N_JOBS, "total_memory": TOTAL_MEMORY}
 
-    print("Using bandpass filter")
-    # recording_filtered = bandpass_filter(recording, FREQ_MIN=FREQ_MIN, FREQ_MAX=FREQ_MAX)
-    recording_filtered = bandpass_filter(recording, freq_min=FREQ_MIN, freq_max=FREQ_MAX, dtype="float32")
-
-    print(f"Kilosort2's .dat path: {recording_dat_path}")
-    if RECOMPUTE_RECORDING or not recording_dat_path.exists():
-        # dtype has to be 'int16' (that's what Kilosort2 expects)
-        # BinaryRecordingExtractor.write_recording(recording_filtered, file_paths=recording_dat_path,
-        #                                          dtype='int16', TOTAL_MEMORY=TOTAL_MEMORY,
-        #                                          N_JOBS=N_JOBS, verbose=verbose, progress_bar=verbose)
-        BinaryRecordingExtractor.write_recording(recording_filtered, file_paths=recording_dat_path,
-                                                 dtype='int16', chunk_memory=CHUNK_MEMORY,
-                                                 n_jobs=N_JOBS, verbose=verbose, progress_bar=verbose)
+    if not recording_saved_path.exists():
+        print(f"Computing bandpass filter and saving recording to {recording_saved_path}")
+        # recording_filtered = bandpass_filter(recording, freq_min=FREQ_MIN, freq_max=FREQ_MAX)
+        recording_filtered = bandpass_filter(recording, freq_min=FREQ_MIN, freq_max=FREQ_MAX, dtype="float32")
+        recording_filtered_saved = recording_filtered.save(folder=recording_saved_path, **job_kwargs)
     else:
-        print(f"Skipping writing recording.dat\nUsing existing {recording_dat_path} as recording file")
+        print(f"Loading existing saved bandpass-filtered recording at {recording_saved_path}")
+        recording_filtered_saved = MaxwellRecordingExtractor.load(recording_saved_path)
+
+    print(f"\nKilosort2's .dat path: {recording_dat_path}")
+    if not recording_dat_path.exists():
+        # dtype has to be 'int16' (that's what Kilosort2 expects--but can change)
+        print("Converting .raw.h5 recording to .dat format for Kilosort2")
+        BinaryRecordingExtractor.write_recording(recording_filtered_saved, file_paths=recording_dat_path,
+                                                 dtype='int16', **job_kwargs)
+    else:
+        print(f"Using existing .dat as recording file for Kilosort2")
     stopwatch.log_time("Done writing recording.")
-    return recording_filtered
+    return recording_filtered_saved
 
 
 def spike_sort(rec_cache, rec_path, recording_dat_path, output_folder):
@@ -2961,11 +2981,12 @@ def spike_sort(rec_cache, rec_path, recording_dat_path, output_folder):
     kilosort = RunKilosort()
     try:
         if not RECOMPUTE_SORTING and (output_folder / "spike_times.npy").exists():
-            print('Skipping', rec_path, ' since already sorted')
-            sorting = kilosort.get_result_from_folder(output_folder)
+            print("Loading Kilosort2's sorting results")
+            sorting = kilosort.get_result_from_folder(output_folder, rec_cache)
         else:
             create_folder(output_folder)
-            sorting = kilosort.run(recording=rec_cache, recording_dat_path=recording_dat_path, output_folder=output_folder)
+            sorting = kilosort.run(recording=rec_cache, recording_dat_path=recording_dat_path,
+                                   output_folder=output_folder)
 
     except Exception as e:
         print(f"Kilosort2 failed on recording {rec_path} because of {e}")
@@ -3004,9 +3025,11 @@ def extract_waveforms(recording, sorting, folder,
         we = WaveformExtractor.load_from_folder(recording, sorting, folder)
         stopwatch.log_time("Done extracting waveforms.")
     else:  # Create new waveform extractor
-        print("Computing new waveforms")
+        print("Extracting new waveforms")
         create_folder(folder)
         we = WaveformExtractor.create(recording, sorting, folder)
+        we.center_spike_times_on_peak()
+
         we.run_extract_waveforms(**job_kwargs)
         we.compute_templates(modes=('average', 'std'))
         stopwatch.log_time("Done extracting waveforms.")
@@ -3104,7 +3127,7 @@ def process_recording(rec_path, inter_path):
     stopwatch = Stopwatch()
 
     # Get Paths
-    rec_path, inter_path, recording_dat_path, output_folder, waveforms_raw_folder, waveforms_curated_folder = get_paths(rec_path, inter_path)
+    rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_raw_folder, waveforms_curated_folder = get_paths(rec_path, inter_path)
 
     # Save a copy of the script
     if SAVE_SCRIPT:
@@ -3116,10 +3139,10 @@ def process_recording(rec_path, inter_path):
     if recording_raw == -1:  # Could not load recording
         return "Could not load recording. Moving on to next recording."
 
-    # Filter and Writing .dat for input to Kilosort2
-    recording_filtered = write_recording(recording_raw, recording_dat_path, verbose=True)
+    # Filter and writing .dat for input to Kilosort2
+    recording_filtered = write_recording(recording_raw, recording_saved_path, recording_dat_path, verbose=True)
 
-    # Spike Sorting
+    # Spike sorting
     sorting = spike_sort(rec_cache=recording_filtered, rec_path=rec_path, recording_dat_path=recording_dat_path,
                          output_folder=output_folder)
     if sorting == -1:  # Could not sort recording
@@ -3174,6 +3197,7 @@ def convert_to_matlab(waveform_extractor, rec_path, matlab_path):
         electrodes = recording.get_property('electrode')
 
     center_spike_times_on_peak_corrected = CENTER_SPIKE_TIMES_ON_PEAK
+    print_stage("FIX MEEEEEEE")
     if CENTER_SPIKE_TIMES_ON_PEAK and MAX_WAVEFORMS_PER_UNIT is not None:
         print("Setting 'CENTER_SPIKE_TIMES_ON_PEAK' to False because 'MAX_WAVEFORMS_PER_UNIT' is not None")
         # To allow 'CENTER_SPIKE_TIMES_ON_PEAK' to be True and 'MAX_WAVEFORMS_PER_UNIT' to be None,
@@ -3187,7 +3211,7 @@ def convert_to_matlab(waveform_extractor, rec_path, matlab_path):
         unit_dict = {}
         max_channel_ind = extremum_channels[u]
         max_location = locations[max_channel_ind]
-        template = waveform_extractor.get_template(u)
+        template = waveform_extractor.get_computed_template(u)
 
         spike_train = sorting.get_unit_spike_train(u)
         if center_spike_times_on_peak_corrected:

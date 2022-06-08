@@ -9,6 +9,7 @@ from spikeinterface.toolkit.preprocessing import bandpass_filter
 import time
 from shutil import rmtree
 from os.path import exists as path_exists
+import numpy as np
 
 
 class Stopwatch:
@@ -36,31 +37,33 @@ TOTAL_MEMORY = "6G"
 FREQ_MIN = 300
 FREQ_MAX = 6000
 
-start_frame = 1000
+start_frame = 13213
 n_samples = int(5e4)
 end_frame = start_frame + n_samples
+traces_slice = slice(300, 600)
 
 maxwell = MaxwellRecordingExtractor(REC_PATH)
+print(type(maxwell))
 
-stopwatch = Stopwatch("Getting raw traces")
-traces = maxwell.get_traces(start_frame=start_frame, end_frame=end_frame)
-stopwatch.log_time("Done.")
-del traces
+# stopwatch = Stopwatch("Getting raw traces")
+# traces = maxwell.get_traces(start_frame=start_frame, end_frame=end_frame)
+# stopwatch.log_time("Done.")
+# del traces
 
 maxwell_filtered = bandpass_filter(maxwell, freq_min=FREQ_MIN, freq_max=FREQ_MAX)
 stopwatch = Stopwatch("\nGetting traces after lazy bandpass")
-traces = maxwell_filtered.get_traces(start_frame=start_frame, end_frame=end_frame)
+traces = np.min(maxwell_filtered.get_traces(start_frame=start_frame, end_frame=end_frame)[traces_slice])
 stopwatch.log_time("Done.")
 del traces
 
-stopwatch = Stopwatch("\nWriting binary recording using lazy filtered recording")
-lazy_binary_path = SAVE_DATA_PATH + "/maxwell_2953_lazy_filtered.dat"
-if path_exists(lazy_binary_path):
-    rmtree(lazy_binary_path)
-BinaryRecordingExtractor.write_recording(maxwell_filtered, file_paths=lazy_binary_path,
-                                         dtype='int16', progress_bar=True,
-                                         n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
-stopwatch.log_time("Done.")
+# stopwatch = Stopwatch("\nWriting binary recording using lazy filtered recording")
+# lazy_binary_path = SAVE_DATA_PATH + "/maxwell_2953_lazy_filtered.dat"
+# if path_exists(lazy_binary_path):
+#     rmtree(lazy_binary_path)
+# BinaryRecordingExtractor.write_recording(maxwell_filtered, file_paths=lazy_binary_path,
+#                                          dtype='int16', progress_bar=True,
+#                                          n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
+# stopwatch.log_time("Done.")
 
 maxwell_filtered_saved_path = SAVE_DATA_PATH + "/maxwell_2953_filtered_cache"
 if path_exists(maxwell_filtered_saved_path):
@@ -69,17 +72,17 @@ stopwatch = Stopwatch("\nSaving bandpass filtered recording")
 maxwell_filtered_saved = maxwell_filtered.save(folder=maxwell_filtered_saved_path, progress_bar=True,
                                                n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
 stopwatch.log_time("Done.")
-
+print(type(maxwell_filtered_saved))
 stopwatch = Stopwatch("\nGetting traces from saved filtered recording")
-traces = maxwell_filtered_saved.get_traces(start_frame=start_frame, end_frame=end_frame)
+traces = np.min(maxwell_filtered_saved.get_traces(start_frame=start_frame, end_frame=end_frame)[traces_slice])
 stopwatch.log_time("Done.")
 del traces
 
-stopwatch = Stopwatch("\nWriting binary recording using saved filtered recording")
-binary_path = SAVE_DATA_PATH + "/maxwell_2953_filtered.dat"
-if path_exists(binary_path):
-    rmtree(binary_path)
-BinaryRecordingExtractor.write_recording(maxwell_filtered_saved, file_paths=binary_path,
-                                         dtype='int16', progress_bar=True,
-                                         n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
-stopwatch.log_time("Done.")
+# stopwatch = Stopwatch("\nWriting binary recording using saved filtered recording")
+# binary_path = SAVE_DATA_PATH + "/maxwell_2953_filtered.dat"
+# if path_exists(binary_path):
+#     rmtree(binary_path)
+# BinaryRecordingExtractor.write_recording(maxwell_filtered_saved, file_paths=binary_path,
+#                                          dtype='int16', progress_bar=True,
+#                                          n_jobs=N_JOBS, total_memory=TOTAL_MEMORY)
+# stopwatch.log_time("Done.")
