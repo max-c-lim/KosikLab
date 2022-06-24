@@ -64,7 +64,7 @@ def main():
     fig.suptitle(f"Electrode Plots")
     fig.canvas.manager.set_window_title(f"electrode_plots")
 
-    # Plot probe
+    # Plot MEA
     channel_locations = mat.get_channel_locations()
     n_channels = channel_locations.shape[0]
     channel_dot_size = 1
@@ -74,7 +74,7 @@ def main():
     y_flipped = max(channel_locations[:, 1])-channel_locations[:, 1]
 
     a00.scatter(channel_locations[:, 0], y_flipped, [channel_dot_size]*n_channels, c="#000000")
-    a00.set_title(f"Recording Probe - {n_channels} channels")
+    a00.set_title(f"Recording MEA - {n_channels} channels")
     a00.set_xlabel("x (μm)")
     a00.set_ylabel("y (μm)")
     a00.set_aspect("equal")
