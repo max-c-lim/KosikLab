@@ -55,7 +55,7 @@ export MW_NVCC_PATH=/usr/local/cuda-10.1/bin
 module load MatLab/R2021b 
 module load cuda/10.1
 """
-SETUP_POD_ENV = True
+SETUP_POD_ENV = False
 
 # Kilosort2 params
 KILOSORT_PARAMS = {
