@@ -9,21 +9,21 @@
 # they will be concatenated in natural ordering.
 RECORDING_FILES = [
     "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
 
 ]
 # List of intermediate folders where Kilosort2 sorting results, waveforms, and graphs are saved
 INTERMEDIATE_FOLDERS = [
     "/home/maxlim/SpikeSorting/data/dated/220628/2950",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2953",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2954",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2957",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/5116",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/5118",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2953",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2954",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2957",
+    "/home/maxlim/SpikeSorting/data/dated/220627/5116",
+    "/home/maxlim/SpikeSorting/data/dated/220627/5118",
 ]
 
 # List of output folders where final .mat and .npz files and figures are saved.
@@ -31,11 +31,11 @@ INTERMEDIATE_FOLDERS = [
 # Figures will have the same name as recording files but will end with _DESCRIPTIVE_NAME.png (e.g. maxone_2953_all_templates_plot.png)
 RESULTS_FOLDERS = [
     "/home/maxlim/SpikeSorting/data/dated/220628/2950",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2953",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2954",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/2957",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/5116",
-    # "/home/maxlim/SpikeSorting/data/dated/220627/5118",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2953",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2954",
+    "/home/maxlim/SpikeSorting/data/dated/220627/2957",
+    "/home/maxlim/SpikeSorting/data/dated/220627/5116",
+    "/home/maxlim/SpikeSorting/data/dated/220627/5118",
 ]
 
 # If COMPILE_RESULTS or CREATE_FIGURES is True, extracted data from all recordings in RECORDING_FILES will be compiled together
