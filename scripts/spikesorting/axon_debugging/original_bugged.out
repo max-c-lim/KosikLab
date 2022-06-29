@@ -1,0 +1,246 @@
+/home/morgane/spikesort_axon_recording_new3.py:66: H5pyDeprecationWarning: The default file mode will change to 'r' (read-only) in h5py 3.0. To suppress this warning, pass the mode you need to h5py.File(), or set the global default h5.get_config().default_file_mode, or set the environment variable H5PY_DEFAULT_READONLY=1. Available modes are: 'r', 'r+', 'w', 'w-'/'x', 'a'. See the docs for details.
+  with h5py.File(file) as f:
+/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/qualitymetrics/misc_metrics.py:194: RuntimeWarning: invalid value encountered in true_divide
+  violation_rate = num_violations / violation_time
+Setting KILOSORT2_PATH environment variable for subprocess calls to: /home/morgane/Kilosort
+/home/morgane/Kilosort
+Reading Maxwell from new version files
+Loading Maxwell recording: rec0000
+MaxwellRecordingExtractor: 1005 channels - 1 segments - 20.0kHz - 2.230s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0001
+MaxwellRecordingExtractor: 1011 channels - 1 segments - 20.0kHz - 6.450s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0002
+MaxwellRecordingExtractor: 1006 channels - 1 segments - 20.0kHz - 2.050s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0003
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 4.710s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0004
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 4.620s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0005
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 3.590s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0006
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 0.200s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0007
+MaxwellRecordingExtractor: 1009 channels - 1 segments - 20.0kHz - 1.380s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0008
+MaxwellRecordingExtractor: 1013 channels - 1 segments - 20.0kHz - 1.930s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0009
+MaxwellRecordingExtractor: 1000 channels - 1 segments - 20.0kHz - 4.530s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0010
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 1.040s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0011
+MaxwellRecordingExtractor: 1001 channels - 1 segments - 20.0kHz - 0.760s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0012
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 4.450s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0013
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 2.370s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0014
+MaxwellRecordingExtractor: 1008 channels - 1 segments - 20.0kHz - 0.720s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0015
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 1.460s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0016
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 0.090s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0017
+MaxwellRecordingExtractor: 1001 channels - 1 segments - 20.0kHz - 1.480s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0018
+MaxwellRecordingExtractor: 1008 channels - 1 segments - 20.0kHz - 5.420s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0019
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 6.040s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0020
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 6.080s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0021
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 2.040s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0022
+MaxwellRecordingExtractor: 1010 channels - 1 segments - 20.0kHz - 7.290s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0023
+MaxwellRecordingExtractor: 998 channels - 1 segments - 20.0kHz - 5.140s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0024
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 1.800s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0025
+MaxwellRecordingExtractor: 998 channels - 1 segments - 20.0kHz - 5.400s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0026
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 5.170s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0027
+MaxwellRecordingExtractor: 1006 channels - 1 segments - 20.0kHz - 3.810s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0028
+MaxwellRecordingExtractor: 1005 channels - 1 segments - 20.0kHz - 0.580s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0029
+MaxwellRecordingExtractor: 1000 channels - 1 segments - 20.0kHz - 2.050s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0030
+MaxwellRecordingExtractor: 1009 channels - 1 segments - 20.0kHz - 0.170s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0031
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 1.500s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Loading Maxwell recording: rec0032
+MaxwellRecordingExtractor: 666 channels - 1 segments - 20.0kHz - 1.750s
+  file_path: /home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170/data.raw.h5
+Number of common electrodes: 216
+
+
+Processing multirec of 33 configurations
+Skipping since already sorted
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+CURATING SORTING OUTPUT
+
+N units before curation: 146
+
+
+Extracting waveforms
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+**********
+Maxwell file format is based on HDF5.
+The internal compression requires a custom plugin!!!
+This is a big pain for the end user.
+You, as a end user, should ask Maxwell company to change this.
+Please visit this page and install the missing decompression libraries:
+https://share.mxwbio.com/d/4742248b2e674a85be97/
+Then, link the decompression library by setting the `HDF5_PLUGIN_PATH` to your 
+installation location, e.g. via
+os.environ['HDF5_PLUGIN_PATH'] = '/path/to/cutum/hdf5/plugin/'
+
+Alternatively, you can use the auto_install_maxwell_hdf5_compression_plugin() below
+function that do it automagically.
+
+**********
+Traceback (most recent call last):
+  File "/home/morgane/spikesort_axon_recording_new3.py", line 291, in <module>
+    qc_df = st.compute_quality_metrics(we_raw, metric_names=["firing_rate", "isi_violation", "snr"])
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/qualitymetrics/quality_metric_calculator.py", line 172, in compute_quality_metrics
+    qmc.compute_metrics()
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/qualitymetrics/quality_metric_calculator.py", line 113, in compute_metrics
+    res = func(self.waveform_extractor, **kwargs)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/qualitymetrics/misc_metrics.py", line 110, in compute_snrs
+    noise_levels = get_noise_levels(recording, return_scaled=return_scaled, **kwargs)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/utils.py", line 99, in get_noise_levels
+    random_chunks = get_random_data_chunks(recording, return_scaled=return_scaled, **random_chunk_kwargs)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/utils.py", line 39, in get_random_data_chunks
+    chunk = recording.get_traces(start_frame=start_frame,
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/core/baserecording.py", line 101, in get_traces
+    traces = rs.get_traces(start_frame=start_frame, end_frame=end_frame, channel_indices=channel_indices)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/preprocessing/remove_artifacts.py", line 102, in get_traces
+    traces = self.parent_recording_segment.get_traces(start_frame, end_frame, channel_indices)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/preprocessing/filter.py", line 107, in get_traces
+    traces_chunk, left_margin, right_margin = get_chunk_with_margin(self.parent_recording_segment,
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/toolkit/preprocessing/tools.py", line 34, in get_chunk_with_margin
+    traces_chunk = rec_segment.get_traces(start_frame - left_margin, end_frame + right_margin, channel_indices)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/core/segmentutils.py", line 198, in get_traces
+    traces_chunk = rec_seg.get_traces(start_frame - seg_start, None, channel_indices)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/core/channelslicerecording.py", line 79, in get_traces
+    traces = self._parent_recording_segment.get_traces(start_frame, end_frame, parent_indices)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/spikeinterface/extractors/neoextractors/neobaseextractor.py", line 106, in get_traces
+    raw_traces = self.neo_reader.get_analogsignal_chunk(
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/neo/rawio/baserawio.py", line 580, in get_analogsignal_chunk
+    raw_chunk = self._get_analogsignal_chunk(
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/neo/rawio/maxwellrawio.py", line 219, in _get_analogsignal_chunk
+    raise(e)
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/neo/rawio/maxwellrawio.py", line 213, in _get_analogsignal_chunk
+    sigs = sigs[sorted_channel_indexes, i_start:i_stop]
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "/home/morgane/anaconda3/lib/python3.8/site-packages/h5py/_hl/dataset.py", line 573, in __getitem__
+    self.id.read(mspace, fspace, arr, mtype, dxpl=self._dxpl)
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5d.pyx", line 182, in h5py.h5d.DatasetID.read
+  File "h5py/_proxy.pyx", line 130, in h5py._proxy.dset_rw
+  File "h5py/_proxy.pyx", line 84, in h5py._proxy.H5PY_H5Dread
+OSError: Can't read data (can't open directory: /home/morgane/so/libcompression.so>)
