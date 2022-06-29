@@ -11,14 +11,14 @@ class MatExtractor:
 
         Parameters
         ----------
-        :param path:
+        path:
             Path to .mat file
-        :param max_unit_id:
+        max_unit_id: int
             If not None, exclude units with an id greater than given
         """
         self.name = "_".join(path.split("/")[-2:])
         self.dict = loadmat(path)
-        self.units = self.get_units(max_unit_id)
+        self.units = self._get_units(max_unit_id)
 
     def get_sampling_frequency(self):
         return self.dict["fs"].squeeze()
@@ -38,12 +38,11 @@ class MatExtractor:
         :return:
             unit of unit_id as Unit class
         """
-        units = self.get_units()
-        for unit in units:
+        for unit in self.units:
             if unit.get_id() == unit_id:
                 return unit
 
-    def get_units(self, max_unit_id=None):
+    def _get_units(self, max_unit_id=None):
         """
         Get units
         :param max_unit_id:
@@ -175,10 +174,10 @@ def find_similar_units(mat_extractor1, mat_extractor2):
     """
     similar_total = 0
     from tqdm import tqdm
-    for unit1 in tqdm(mat_extractor1.get_units()):  # type: Unit
+    for unit1 in tqdm(mat_extractor1.units):  # type: Unit
         st1 = unit1.get_spike_train()
         electrode1 = unit1.get_electrode()
-        for unit2 in mat_extractor2.get_units():  # type: Unit
+        for unit2 in mat_extractor2.units:  # type: Unit
             st2 = unit2.get_spike_train()
             electrode2 = unit2.get_electrode()
             if electrode1 != electrode2:

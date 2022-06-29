@@ -46,7 +46,7 @@ COMPILED_RESULTS_FOLDER = "/home/maxlim/SpikeSorting/data/dated/220628/compiled"
 ######################################################
 # Set Kilosort2's path
 KILOSORT_PATH = "/home/maxlim/SpikeSorting/Kilosort2"  # "/home/vandermolen/Kilosort"
-# Set plugin path
+# Set path of plugin (the path to the folder containing libcompression.so)
 HDF5_PLUGIN_PATH = '/home/maxlim/SpikeSorting/extra_libraries/'  # '/home/vandermolen/SpikeSorting/extra_libraries/'
 
 # If True, script will automatically run the following commands which setup MATLAB environment ofr pod-gpu.cnsi.ucsb.edu:
