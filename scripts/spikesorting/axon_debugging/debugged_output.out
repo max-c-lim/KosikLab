@@ -1,0 +1,748 @@
+Setting KILOSORT2_PATH environment variable for subprocess calls to: /home/maxlim/SpikeSorting/Kilosort2
+/home/maxlim/SpikeSorting/Kilosort2
+Reading Maxwell from new version files
+Loading Maxwell recording: rec0000
+MaxwellRecordingExtractor: 1005 channels - 1 segments - 20.0kHz - 2.230s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0001
+MaxwellRecordingExtractor: 1011 channels - 1 segments - 20.0kHz - 6.450s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0002
+MaxwellRecordingExtractor: 1006 channels - 1 segments - 20.0kHz - 2.050s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0003
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 4.710s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0004
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 4.620s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0005
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 3.590s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0006
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 0.200s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0007
+MaxwellRecordingExtractor: 1009 channels - 1 segments - 20.0kHz - 1.380s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0008
+MaxwellRecordingExtractor: 1013 channels - 1 segments - 20.0kHz - 1.930s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0009
+MaxwellRecordingExtractor: 1000 channels - 1 segments - 20.0kHz - 4.530s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0010
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 1.040s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0011
+MaxwellRecordingExtractor: 1001 channels - 1 segments - 20.0kHz - 0.760s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0012
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 4.450s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0013
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 2.370s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0014
+MaxwellRecordingExtractor: 1008 channels - 1 segments - 20.0kHz - 0.720s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0015
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 1.460s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0016
+MaxwellRecordingExtractor: 1002 channels - 1 segments - 20.0kHz - 0.090s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0017
+MaxwellRecordingExtractor: 1001 channels - 1 segments - 20.0kHz - 1.480s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0018
+MaxwellRecordingExtractor: 1008 channels - 1 segments - 20.0kHz - 5.420s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0019
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 6.040s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0020
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 6.080s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0021
+MaxwellRecordingExtractor: 1003 channels - 1 segments - 20.0kHz - 2.040s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0022
+MaxwellRecordingExtractor: 1010 channels - 1 segments - 20.0kHz - 7.290s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0023
+MaxwellRecordingExtractor: 998 channels - 1 segments - 20.0kHz - 5.140s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0024
+MaxwellRecordingExtractor: 999 channels - 1 segments - 20.0kHz - 1.800s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0025
+MaxwellRecordingExtractor: 998 channels - 1 segments - 20.0kHz - 5.400s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0026
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 5.170s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0027
+MaxwellRecordingExtractor: 1006 channels - 1 segments - 20.0kHz - 3.810s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0028
+MaxwellRecordingExtractor: 1005 channels - 1 segments - 20.0kHz - 0.580s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0029
+MaxwellRecordingExtractor: 1000 channels - 1 segments - 20.0kHz - 2.050s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0030
+MaxwellRecordingExtractor: 1009 channels - 1 segments - 20.0kHz - 0.170s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0031
+MaxwellRecordingExtractor: 1004 channels - 1 segments - 20.0kHz - 1.500s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Loading Maxwell recording: rec0032
+MaxwellRecordingExtractor: 666 channels - 1 segments - 20.0kHz - 1.750s
+  file_path: /home/maxlim/SpikeSorting/axon_debugging/test_data/data.raw.h5
+Number of common electrodes: 216
+
+
+Processing multirec of 33 configurations
+Skipping since already sorted
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+CURATING SORTING OUTPUT
+
+N units before curation: 146
+
+
+Extracting waveforms
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Curation based on firing rate
+N units after num spikes curation: 141
+
+Curation based on isi violation ratio
+N units after ISI curation: 136
+
+Curation based on SNR
+N units after SNR curation: 136
+
+Curated sorting saved to /home/maxlim/SpikeSorting/axon_debugging/test_data/cache/sorting_curated
+
+
+
+Total filtering, sorting, curation elapsed time 36.55 s
+Splitting sortings
+Versions are not the same. This might lead to errors. Use  spikeinterface version 0.92.0
+Splitting sorting 0
+Splitting sorting 1
+Splitting sorting 2
+Splitting sorting 3
+Splitting sorting 4
+Splitting sorting 5
+Splitting sorting 6
+Splitting sorting 7
+Splitting sorting 8
+Splitting sorting 9
+Splitting sorting 10
+Splitting sorting 11
+Splitting sorting 12
+Splitting sorting 13
+Splitting sorting 14
+Splitting sorting 15
+Splitting sorting 16
+Splitting sorting 17
+Splitting sorting 18
+Splitting sorting 19
+Splitting sorting 20
+Splitting sorting 21
+Splitting sorting 22
+Splitting sorting 23
+Splitting sorting 24
+Splitting sorting 25
+Splitting sorting 26
+Splitting sorting 27
+Splitting sorting 28
+Splitting sorting 29
+Splitting sorting 30
+Splitting sorting 31
+Splitting sorting 32
+Elapsed time splitting 17.224138021469116
+All locations: 25876, Intersection among configurations: 216
+Extracting full templates
+Extracting templates for recording 1 / 33
+Total units: 136 - Units in 1: 34
+Extracting templates for recording 2 / 33
+Total units: 136 - Units in 2: 61
+Extracting templates for recording 3 / 33
+Total units: 136 - Units in 3: 60
+Extracting templates for recording 4 / 33
+Total units: 136 - Units in 4: 84
+Extracting templates for recording 5 / 33
+Total units: 136 - Units in 5: 77
+Extracting templates for recording 6 / 33
+Total units: 136 - Units in 6: 80
+Extracting templates for recording 7 / 33
+Total units: 136 - Units in 7: 18
+Extracting templates for recording 8 / 33
+Total units: 136 - Units in 8: 50
+Extracting templates for recording 9 / 33
+Total units: 136 - Units in 9: 46
+Extracting templates for recording 10 / 33
+Total units: 136 - Units in 10: 72
+Extracting templates for recording 11 / 33
+Total units: 136 - Units in 11: 47
+Extracting templates for recording 12 / 33
+Total units: 136 - Units in 12: 37
+Extracting templates for recording 13 / 33
+Total units: 136 - Units in 13: 69
+Extracting templates for recording 14 / 33
+Total units: 136 - Units in 14: 57
+Extracting templates for recording 15 / 33
+Total units: 136 - Units in 15: 37
+Extracting templates for recording 16 / 33
+Total units: 136 - Units in 16: 45
+Extracting templates for recording 17 / 33
+Total units: 136 - Units in 17: 15
+Extracting templates for recording 18 / 33
+Total units: 136 - Units in 18: 56
+Extracting templates for recording 19 / 33
+Total units: 136 - Units in 19: 86
+Extracting templates for recording 20 / 33
+Total units: 136 - Units in 20: 78
+Extracting templates for recording 21 / 33
+Total units: 136 - Units in 21: 72
+Extracting templates for recording 22 / 33
+Total units: 136 - Units in 22: 50
+Extracting templates for recording 23 / 33
+Total units: 136 - Units in 23: 97
+Extracting templates for recording 24 / 33
+Total units: 136 - Units in 24: 75
+Extracting templates for recording 25 / 33
+Total units: 136 - Units in 25: 47
+Extracting templates for recording 26 / 33
+Total units: 136 - Units in 26: 51
+Extracting templates for recording 27 / 33
+Total units: 136 - Units in 27: 54
+Extracting templates for recording 28 / 33
+Total units: 136 - Units in 28: 65
+Extracting templates for recording 29 / 33
+Total units: 136 - Units in 29: 29
+Extracting templates for recording 30 / 33
+Total units: 136 - Units in 30: 51
+Extracting templates for recording 31 / 33
+Total units: 136 - Units in 31: 9
+Extracting templates for recording 32 / 33
+Total units: 136 - Units in 32: 44
+Extracting templates for recording 33 / 33
+Total units: 136 - Units in 33: 42
+Extracting template 0
+Extracting template 1
+Extracting template 2
+Extracting template 3
+Extracting template 4
+Extracting template 5
+Extracting template 6
+Extracting template 7
+Extracting template 8
+Extracting template 9
+Extracting template 10
+Extracting template 11
+Extracting template 12
+Extracting template 13
+Extracting template 14
+Extracting template 15
+Extracting template 16
+Extracting template 17
+Extracting template 18
+Extracting template 19
+Extracting template 20
+Extracting template 21
+Extracting template 22
+Extracting template 23
+Extracting template 24
+Extracting template 25
+Extracting template 26
+Extracting template 27
+Extracting template 28
+Extracting template 29
+Extracting template 30
+Extracting template 31
+Extracting template 32
+Extracting template 33
+Extracting template 34
+Extracting template 35
+Extracting template 36
+Extracting template 37
+Extracting template 38
+Extracting template 39
+Extracting template 40
+Extracting template 41
+Extracting template 42
+Extracting template 43
+Extracting template 44
+Extracting template 45
+Extracting template 46
+Extracting template 47
+Extracting template 48
+Extracting template 49
+Extracting template 50
+Extracting template 51
+Extracting template 52
+Extracting template 53
+Extracting template 54
+Extracting template 55
+Extracting template 56
+Extracting template 57
+Extracting template 58
+Extracting template 59
+Extracting template 60
+Extracting template 61
+Extracting template 62
+Extracting template 63
+Extracting template 64
+Extracting template 65
+Extracting template 66
+Extracting template 67
+Extracting template 68
+Extracting template 69
+Extracting template 70
+Extracting template 71
+Extracting template 72
+Extracting template 73
+Extracting template 74
+Extracting template 75
+Extracting template 76
+Extracting template 77
+Extracting template 78
+Extracting template 79
+Extracting template 80
+Extracting template 81
+Extracting template 82
+Extracting template 83
+Extracting template 84
+Extracting template 85
+Extracting template 86
+Extracting template 87
+Extracting template 88
+Extracting template 89
+Extracting template 90
+Extracting template 91
+Extracting template 92
+Extracting template 93
+Extracting template 94
+Extracting template 95
+Extracting template 96
+Extracting template 97
+Extracting template 98
+Extracting template 99
+Extracting template 100
+Extracting template 101
+Extracting template 102
+Extracting template 103
+Extracting template 104
+Extracting template 105
+Extracting template 106
+Extracting template 107
+Extracting template 108
+Extracting template 109
+Extracting template 110
+Extracting template 111
+Extracting template 112
+Extracting template 113
+Extracting template 114
+Extracting template 115
+Extracting template 116
+Extracting template 117
+Extracting template 118
+Extracting template 119
+Extracting template 120
+Extracting template 121
+Extracting template 122
+Extracting template 123
+Extracting template 124
+Extracting template 125
+Extracting template 126
+Extracting template 127
+Extracting template 128
+Extracting template 129
+Extracting template 130
+Extracting template 131
+Extracting template 132
+Extracting template 133
+Extracting template 134
+Extracting template 135
+Elapsed time full template extraction: 2808.2632360458374s
+Saving templates in npy
+Saving locations in npy
+Total units 136
+
+
+Total plotting time 0.0 s
+Axon tracking params
+{'detect_threshold': 0.01,
+ 'detection_type': 'relative',
+ 'distance_exp': 2,
+ 'edge_dist_amp_ratio': 0.3,
+ 'init_amp_peak_ratio': 0.2,
+ 'init_delay': 0.2,
+ 'kurt_threshold': 0.3,
+ 'mad_threshold': 8,
+ 'max_distance_for_edge': 300,
+ 'max_distance_to_init': 200,
+ 'max_peak_latency_for_splitting': 0.5,
+ 'min_outlier_tracking_error': 50,
+ 'min_path_length': 100,
+ 'min_path_points': 5,
+ 'min_points_after_branching': 3,
+ 'min_selected_points': 30,
+ 'n_neighbors': 3,
+ 'neighbor_radius': 100,
+ 'peak_std_distance': 30,
+ 'peak_std_threshold': 1,
+ 'r2_threshold': 0.9,
+ 'r2_threshold_for_outliers': 0.98,
+ 'remove_isolated': True,
+ 'split_paths': True,
+ 'theilsen_maxiter': 2000,
+ 'upsample': 2}
+Axon tracking failed unit 0: 
+Error No branches found
+Axon tracking failed unit 1: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 2: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 3: 
+Error Not enough channels selected to compute velocity
+Found axon unit 4
+Axon tracking failed unit 5: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 6: 
+Error No branches left after cleaning
+Axon tracking failed unit 7: 
+Error No branches found
+Axon tracking failed unit 9: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 10: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 11: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 12: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 13: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 14: 
+Error No branches left after cleaning
+Axon tracking failed unit 15: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 16: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 17: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 18: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 19: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 20: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 21: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 22: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 24: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 26: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 27: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 28: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 29: 
+Error No branches found
+Axon tracking failed unit 30: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 31: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 32: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 33: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 34: 
+Error Not enough channels selected to compute velocity
+Found axon unit 36
+Axon tracking failed unit 37: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 38: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 39: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 40: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 41: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 42: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 43: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 44: 
+Error No branches left after cleaning
+Axon tracking failed unit 45: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 46: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 47: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 48: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 49: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 50: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 51: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 52: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 53: 
+Error No branches found
+Axon tracking failed unit 54: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 56: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 57: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 58: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 59: 
+Error No branches found
+Axon tracking failed unit 60: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 61: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 62: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 63: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 65: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 66: 
+Error No branches left after cleaning
+Axon tracking failed unit 67: 
+Error No branches left after cleaning
+Axon tracking failed unit 68: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 69: 
+Error No branches left after cleaning
+Axon tracking failed unit 70: 
+Error No branches left after cleaning
+Axon tracking failed unit 71: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 72: 
+Error No branches left after cleaning
+Axon tracking failed unit 73: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 74: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 75: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 76: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 77: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 78: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 79: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 81: 
+Error No branches found
+Axon tracking failed unit 82: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 83: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 84: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 85: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 86: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 87: 
+Error No branches found
+Axon tracking failed unit 88: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 89: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 90: 
+Error No branches left after cleaning
+Axon tracking failed unit 91: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 92: 
+Error No branches left after cleaning
+Axon tracking failed unit 93: 
+Error No branches left after cleaning
+Axon tracking failed unit 94: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 95: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 96: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 97: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 98: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 99: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 100: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 101: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 102: 
+Error No branches found
+Axon tracking failed unit 103: 
+Error Not enough channels selected to compute velocity
+Found axon unit 104
+Axon tracking failed unit 105: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 106: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 107: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 108: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 109: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 110: 
+Error No branches found
+Axon tracking failed unit 111: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 112: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 113: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 114: 
+Error No branches found
+Axon tracking failed unit 115: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 116: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 117: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 118: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 119: 
+Error No branches found
+Axon tracking failed unit 120: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 121: 
+Error No branches left after cleaning
+Axon tracking failed unit 123: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 125: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 126: 
+Error No branches found
+Axon tracking failed unit 127: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 128: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 129: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 130: 
+Error No branches left after cleaning
+Axon tracking failed unit 131: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 132: 
+Error No branches found
+Axon tracking failed unit 133: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 134: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 135: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 136: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 137: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 139: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 140: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 141: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 142: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 143: 
+Error No branches found
+Axon tracking failed unit 144: 
+Error Not enough channels selected to compute velocity
+Axon tracking failed unit 145: 
+Error Not enough channels selected to compute velocity
+Found 3 with a detectable axons!
+
+
+Total axon extraction time 3511.51 s
+
+
+Total axon plotting time 63.65 s

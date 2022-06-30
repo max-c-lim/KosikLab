@@ -85,7 +85,10 @@ assert len(axon_scan_folders) == len(intermediate_folders), "'axon_scan_folders'
 # sorter name
 sorter = 'kilosort2'
 ss.Kilosort2Sorter.set_kilosort2_path("/home/morgane/Kilosort")
-print (ss.Kilosort2Sorter.kilosort2_path)
+print(ss.Kilosort2Sorter.kilosort2_path)
+
+# folder containing libcompression.so
+os.environ['HDF5_PLUGIN_PATH'] = '/home/morgane/so'
 
 # sorter params
 sorter_params = {"n_jobs_bin": 1, "total_memory": "4G"}
@@ -342,7 +345,7 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
 
             if export_curated_to_phy:
                 print("Exporting auto-curated sorting output to Phy")
-                export_to_phy(we_curated, cache_folder / "phy_curated", n_jobs=n_jobs, total_memory=total_memory,
+                export_to_phy(sorting_curated, cache_folder / "phy_curated", n_jobs=n_jobs, total_memory=total_memory,
                               progress_bar=True)
 
             if dump_sorting:
