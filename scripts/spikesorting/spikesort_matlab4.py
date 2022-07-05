@@ -1,8 +1,7 @@
 ######################################################
 ################  FOLDER LOCATIONS ###################
 ######################################################
-# RECORDING_FILES, INTERMEDIATE_FOLDERS, and RESULTS_FOLDERS
-# must all have the same length
+# RECORDING_FILES, INTERMEDIATE_FOLDERS, and RESULTS_FOLDERS must all have the same length
 
 # List of data files (.raw.h5) you want to spike sort
 # If path is a folder with multiple recording files,
@@ -16,30 +15,27 @@ RECORDING_FILES = [
     "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
 
 ]
-# List of intermediate folders where Kilosort2 sorting results, waveforms, and graphs are saved
+# List of intermediate folders where Kilosort2 sorting results, raw waveforms, and curation data are saved
 INTERMEDIATE_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/dated/220628/2950",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2953",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2954",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2957",
-    "/home/maxlim/SpikeSorting/data/dated/220627/5116",
-    "/home/maxlim/SpikeSorting/data/dated/220627/5118",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2950",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2953",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2954",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2957",
+    "/home/maxlim/SpikeSorting/data/dated/220704/5116",
+    "/home/maxlim/SpikeSorting/data/dated/220704/5118",
 ]
-
-# List of output folders where final .mat and .npz files and figures are saved.
-# .mat and .npz files will have the same name as recording files but will end with _sorted.mat or _sorted.npz
-# Figures will have the same name as recording files but will end with _DESCRIPTIVE_NAME.png (e.g. maxone_2953_all_templates_plot.png)
+# List of output folders where compiled results for each recording are stored
 RESULTS_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/dated/220628/2950",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2953",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2954",
-    "/home/maxlim/SpikeSorting/data/dated/220627/2957",
-    "/home/maxlim/SpikeSorting/data/dated/220627/5116",
-    "/home/maxlim/SpikeSorting/data/dated/220627/5118",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2950/results",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2953/results",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2954/results",
+    "/home/maxlim/SpikeSorting/data/dated/220704/2957/results",
+    "/home/maxlim/SpikeSorting/data/dated/220704/5116/results",
+    "/home/maxlim/SpikeSorting/data/dated/220704/5118/results",
 ]
 
-# If COMPILE_RESULTS or CREATE_FIGURES is True, extracted data from all recordings in RECORDING_FILES will be compiled together
-COMPILED_RESULTS_FOLDER = "/home/maxlim/SpikeSorting/data/dated/220628/compiled"
+# If COMPILE_RESULTS is True, extracted data from all recordings in RECORDING_FILES will be compiled together
+COMPILED_RESULTS_FOLDER = "/home/maxlim/SpikeSorting/data/dated/220704/6_compiled"
 
 ######################################################
 ###############  KILOSORT PARAMETERS  ################
@@ -55,7 +51,7 @@ export MW_NVCC_PATH=/usr/local/cuda-10.1/bin
 module load MatLab/R2021b 
 module load cuda/10.1
 """
-SETUP_POD_ENV = False
+SETUP_POD_ENV = True
 
 # Kilosort2 params
 KILOSORT_PARAMS = {
@@ -77,16 +73,14 @@ KILOSORT_PARAMS = {
 ######################################################
 ###############  RECOMPUTE RESULTS?  #################
 ######################################################
-# If True and exists, its entire parent folder is deleted and recomputed
-# (5/19/2022) If False and exists and new recording is specified in RECORDING_FILES, it will not be computed and the old data will be used.
-RECOMPUTE_RECORDING = False  # Refers to the .dat recording file created for Kilosort2. If True, the 3 other recompute variables become True too
+# If True and exists, the ENTIRE FOLDER is deleted
+RECOMPUTE_RECORDING = False  # Refers to the .dat recording file created for Kilosort2. If True, all the following variable become True as well
 RECOMPUTE_SORTING = False  # If True, entire intermediate_folder will be deleted
 REEXTRACT_WAVEFORMS = False
 RECURATE_FIRST = False
 RECURATE_SECOND = False
-REEXPORT_MAT = False
-REEXPORT_NPZ = REEXPORT_MAT
-RECOMPILE_RESULTS = True
+RECOMPILE_SINGLE_RECORDING = False  # If True, results stored in the RESULTS_FOLDERS are recomputed
+RECOMPILE_ALL_RECORDINGS = True  # If True, results stored in COMPILED_RESULTS_FOLDER are recomputed
 
 ######################################################
 ##################  COPY SCRIPT?  ####################
@@ -102,10 +96,10 @@ SAVE_SCRIPT = False
 # Number of jobs to use for converting raw recording and extracting waveforms
 N_JOBS = 64
 # Total RAM to use for converting raw and extracting waveforms
-TOTAL_MEMORY = "6G"
+TOTAL_MEMORY = "8G"
 # IF False, do not use parallel processing for converting the raw recording to the proper format for Kilosort2
 #           The entire recording will be loaded into RAM
-USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION = True
+USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION = False
 
 ######################################################
 ############  BANDPASS FILTER PARAMETERS  ############
@@ -139,9 +133,11 @@ MAX_WAVEFORMS_PER_UNIT = None
 ######################################################
 ###############  CURATION PARAMETERS  ################
 ######################################################
-# If True, units are curated based on firing rate, ISI, SNR, and/or min spikes per unit
+# If True, units are curated based on firing rate, ISI, SNR, and/or min spikes per unit.
+# This curation is used to determine whether each unit represents a real neuron or random noise
 CURATE_FIRST = True
 # If True, units are curated based on min spikes per unit and/or max norm std
+# This curation is used to select only the most consistent waveforms
 CURATE_SECOND = True
 
 # If both CURATE_FIRST and CURATE_SECOND are True, then first curation precedes second curation
@@ -207,32 +203,44 @@ The following will be saved:
 SAVE_ELECTRODES = True
 
 ######################################################
-################  COMPILE PARAMETERS  ################
+################  RESULTS PARAMETERS  ################
 ######################################################
 """
-If COMPILE_RESULTS is True, the following files will be created in COMPILED_RESULTS_FOLDER
+RESULTS_FOLDERS = List of output folders where final results of each recording are saved
+Results will be stored in the following folder hierarchy:
 
-1) In COMPILED_RESULTS_FOLDER/waveforms, each curated waveform from every recording will be saved as a .npy array.
-   Each waveform file will have shape (n_waveforms, n_samples, n_channels).
-   The name of the file will be waveforms_#.npy where # is the index when the waveforms are sorted
-   by amplitude (highest amplitude = 0, second highest amplitude = 1, etc.) 
-
-2) In COMPILED_RESULTS_FOLDER/spike_times, for each recording, a csv file with the detected spike times in samples. The spike times will be converted as though
-   the recordings in RECORDING_FILES were concatenated into one recording in the order given in RECORDING_FILES.
-
-3) In COMPILED_RESULTS_FOLDERS/figures, the three figures below will be saved if CREATE_FIGURES is True
-
-4) In COMPILED_RESULTS_FOLDER, a json file with the path to each recording in RECORDING_FILES, the parameters values used for Kilosort2's spike sorting,
-   and the curation parameters. This json file assumes that the parameters in this current script were used for spike sorting
-   and curation. I.e., if the units were curated with parameters different from the ones in this script (which can be
-   the case if the units were curated and the parameters were changed without recurating the units), the json file
-   will have the most recent parameters. 
-   
-5) In COMPILED_RESULTS_FOLDER/sorted_npz, two .npz files (one for units with positive peaks and the other for negative peaks)
-   containing the sorted unit results (described in section EXPORT PARAMETERS). "locations" and "fs" will be structures 
-   to differentiate between different recordings
+RESULTS_FOLDER
+        sorted.mat (created only if COMPILE_TO_MAT is True)
+        sorted.npz (created only if COMPILE_TO_NPZ is True)
+        spike_times.npy
+        spike_clusters.npy
+        parameters.json
+    figures (created only if CREATE_FIGURES is True)
+        curation_bar_plot.png
+        std_scatter_plot.png (created only if CURATE_SECOND is True, SPIKES_MIN_SECOND is not None, and STD_NORM_MAX is not None)
+        all_templates_plot.png
+    waveforms (created only if EXPORT_WAVEFORMS is True)
+        negative_peaks
+            waveforms_0.npy
+            waveforms_1.npy
+            waveforms_2.npy
+            ...
+        positive_peaks
+            waveforms_0.npy
+            waveforms_1.npy
+            waveforms_2.npy
+            ...
+The .mat and .npz files with same names will have same results
+negative_peaks store the units with negative peaks and positive_peaks store the units with positive peaks
+The .npy files in "waveforms" contain the waveforms for each unit (after curation if script is set to curate units)
+    The waveforms will have shape (n_waveforms, n_samples, n_channels)
+    The waveforms will be sorted in descending order of amplitude (i.e. 0=largest amplitude, 1=second largest amplitude, etc.)
 """
-COMPILE_RESULTS = True
+COMPILE_TO_MAT = True
+COMPILE_TO_NPZ = True
+COMPILE_WAVEFORMS = True
+COMPILE_SINGLE_RECORDING = False
+COMPILE_ALL_RECORDINGS = True
 
 # ms before waveform peak to include in saved numpy array
 COMPILED_WAVEFORMS_MS_BEFORE = 0.5
@@ -280,6 +288,10 @@ BAR_X_LABEL = "Recording"
 BAR_Y_LABEL = "Number of Units"
 # Rotation of bar labels in degrees (counterclockwise)
 BAR_LABEL_ROTATION = 0
+# Label for number of units after first curation
+BAR_TOTAL_LABEL = "First Curation"
+# Label for number of units after second curation
+BAR_SELECTED_LABEL = "Second Curation"
 
 ##############
 # For plot 2 #
@@ -320,17 +332,12 @@ ALL_TEMPLATES_COLOR_CURATED = "#000000"
 ALL_TEMPLATES_COLOR_FAILED = "#FF0000"
 # Number of templates to be plotted in the same column
 ALL_TEMPLATES_PER_COLUMN = 50
-# Vertical distance between templates (not actual distance. larger values cause lower resolution and vice versa)
-ALL_TEMPLATES_Y_DISTANCE = 50
-# Buffer for limits of y-axis to add white space at the top and bottom of plots
-ALL_TEMPLATES_Y_LIM_BUFFER = 10
-# ms before waveform peaks to include in plot (If None-> use entire waveform)
-# (If greater than WAVEFORMS_MS_BEFORE, WAVEFORMS_MS_BEFORE will be used instead)
+# Spacing between templates (larger values cause lower resolution and vice versa)
+ALL_TEMPLATES_Y_SPACING = 50
+# ms before waveform peaks to include in plot
 ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK = 5.0
-# ms after waveform peaks to include in plot (If None-> use entire waveform)
-# (If greater than WAVEFORMS_MS_AFTER, WAVEFORMS_MS_AFTER will be used instead)
+# ms after waveform peaks to include in plot
 ALL_TEMPLATES_WINDOW_MS_AFTER_PEAK = 5.0
-
 # Vertical dotted lines at LINE_MS_BEFORE_PEAK and LINE_MS_AFTER_PEAK will be plotted before and after
 # the waveform peaks, respectively
 # If None-> no line is plotted
@@ -339,8 +346,6 @@ ALL_TEMPLATES_LINE_MS_AFTER_PEAK = 1.5
 # Label for x-axis
 ALL_TEMPLATES_X_LABEL = "Time Rel. to Peak (ms)"
 
-# TODO
-# 1) Add try-except catch in case of error with Kilosort when using parallel processing. reconvert recording with different params
 ######################################################
 ######################  CODE  ########################
 ######################################################
@@ -384,6 +389,11 @@ from spikeinterface.extractors import BinaryRecordingExtractor
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.axes._axes as axes
+if CREATE_FIGURES:
+    if FIGURES_DPI is not None:
+        mpl.rcParams["figure.dpi"] = FIGURES_DPI
+    if FIGURES_FONT_SIZE is not None:
+        mpl.rcParams["font.size"] = FIGURES_FONT_SIZE
 import subprocess
 import tempfile
 import shutil
@@ -1240,7 +1250,7 @@ class WaveformExtractor:
         self.chans_max_all = None
 
     @classmethod
-    def create_root(cls, recording_path, recording, sorting, root_folder):
+    def create_initial(cls, recording_path, recording, sorting, root_folder, initial_folder):
         # Create root waveform folder and data
         root_folder = Path(root_folder)
         create_folder(root_folder / 'waveforms')
@@ -1260,7 +1270,7 @@ class WaveformExtractor:
         with open(root_folder / "extraction_parameters.json", "w") as f:
             json.dump(parameters, f)
 
-        we = cls(recording, sorting, root_folder, root_folder / "initial")
+        we = cls(recording, sorting, root_folder, initial_folder)
 
         # Get template window sizes for computing location of negative peak during waveform extraction
         we.use_pos_peak, we.chans_max_kilosort, we.chans_max_all = we.sorting.get_chans_max()
@@ -1269,7 +1279,10 @@ class WaveformExtractor:
                                         (we.use_pos_peak, we.chans_max_kilosort, we.chans_max_all)):
             np.save(we.chans_max_folder / save_file, save_data)
 
-        np.save(str(we.folder / "unit_ids.npy"), we.sorting.unit_ids)
+        # Save unit data
+        np.save(str(initial_folder / "unit_ids.npy"), sorting.unit_ids)
+        np.save(str(initial_folder / "spike_times.npy"), sorting.spike_times)
+        np.save(str(initial_folder / "spike_clusters.npy"), sorting.spike_clusters)
 
         return we
 
@@ -1295,7 +1308,7 @@ class WaveformExtractor:
             we.chans_max_kilosort = chans_max_kilosort
             we.chans_max_all = chans_max_all
 
-        we.load_unit_ids()
+        we.load_units()
         return we
 
     def ms_to_samples(self, ms):
@@ -1566,7 +1579,7 @@ class WaveformExtractor:
         indices: np.array
             If 'with_index' is True, the spike indices corresponding to the waveforms extracted
         """
-        assert unit_id in self.sorting.unit_ids, "'unit_id' is invalid"
+        # assert unit_id in self.sorting.unit_ids, "'unit_id' is invalid"
         wfs = self._waveforms.get(unit_id, None)
         if wfs is None:
             waveform_file = self.root_folder / 'waveforms' / f'waveforms_{unit_id}.npy'
@@ -1687,7 +1700,8 @@ class WaveformExtractor:
             templates = np.zeros((max(unit_ids) + 1, self.nsamples, num_chans), dtype=self.dtype)
             self.template_cache[mode] = templates
 
-        for unit_id in unit_ids:
+        print(f"Computing templates for {len(unit_ids)} units")
+        for unit_id in tqdm(unit_ids):
             wfs = self.get_waveforms(unit_id, cache=False)
             for mode in modes:
                 if mode == 'median':
@@ -1709,26 +1723,29 @@ class WaveformExtractor:
             np.save(str(template_file), templates)
         stopwatch.log_time("Done computing and saving templates.")
 
-    def load_unit_ids(self):
-        unit_ids_folder = self.folder / "unit_ids.npy"
-
-        if unit_ids_folder.exists():
-            self.sorting.unit_ids = np.load(unit_ids_folder).astype(int).tolist()
-            return
+    def load_units(self):
+        self.sorting.unit_ids = np.load(str(self.folder / "unit_ids.npy")).tolist()
+        self.sorting.spike_times = np.load(str(self.folder / "spike_times.npy"))
+        self.sorting.spike_clusters = np.load(str(self.folder / "spike_clusters.npy"))
 
     def get_curation_history(self):
-        with open(self.folder / "curation_history.json", "r") as f:
-            return json.load(f)
-
+        path = self.folder / "curation_history.json"
+        if path.exists():
+            with open(self.folder / "curation_history.json", "r") as f:
+                return json.load(f)
+        else:
+            return None
     # endregion
 
     # region Format files
-    def save_curated_units(self, waveforms_root_folder, curated_folder, curation_history):
+    def save_curated_units(self, unit_ids, waveforms_root_folder, curated_folder, curation_history):
         """
         Filters units by storing curated unit ids in a new folder.
 
         Parameters
         ----------
+        unit_ids: list
+            Contains which unit ids are curated
         waveforms_root_folder: Path
             The root of all waveforms
         curated_folder: Path
@@ -1743,12 +1760,24 @@ class WaveformExtractor:
         """
         print_stage("SAVING CURATED UNITS")
         stopwatch = Stopwatch()
-        unit_ids = self.sorting.unit_ids
         print(f"Saving {len(unit_ids)} curated units to new folder")
         create_folder(curated_folder)
 
-        # Save unit_ids
+        # Save data about unit ids
+        spike_times_og = self.sorting.spike_times
+        spike_clusters_og = self.sorting.spike_clusters
+        unit_ids_set = set(unit_ids)
+        selected_indices = [i for i, c in enumerate(spike_clusters_og) if c in unit_ids_set]
+        spike_times = spike_times_og[selected_indices]
+        spike_clusters = spike_clusters_og[selected_indices]
+
         np.save(str(curated_folder / "unit_ids.npy"), unit_ids)
+        np.save(str(curated_folder / "spike_times.npy"), spike_times)
+        np.save(str(curated_folder / "spike_clusters.npy"), spike_clusters)
+
+        # Save curation history
+        with open(curated_folder / "curation_history.json", "w") as f:
+            json.dump(curation_history, f)
 
         # region Copy waveforms
         # # Create waveforms folder
@@ -1772,15 +1801,8 @@ class WaveformExtractor:
                                                 self.use_pos_peak, self.chans_max_kilosort, self.chans_max_all)
         stopwatch.log_time("Done saving curated units.")
 
-        # Save curation history
-        print_stage("SAVING CURATION HISTORY")
-        stopwatch = Stopwatch()
-        curation_history["final"] = we.sorting.unit_ids
-        with open(curated_folder / "curation_history.json", "w") as f:
-            json.dump(curation_history, f)
-        stopwatch.log_time("Done.")
-
         return we
+
     # endregion
 
 
@@ -3150,11 +3172,661 @@ class Stopwatch:
             print(f"{text} Time: {time.time() - self._time_start:.2f}s")
 
 
-def create_folder(path, parents=True):
-    path = Path(path)
-    if not path.exists():
-        path.mkdir(parents=parents)
-        print(f"Created folder: {path}")
+class Compiler:
+    """
+    Class to compile together results from different recordings
+    """
+    def __init__(self):
+        self.create_figures = CREATE_FIGURES
+        self.create_std_scatter_plot = CURATE_SECOND and SPIKES_MIN_SECOND is not None and STD_NORM_MAX is not None
+
+        self.compile_to_mat = COMPILE_TO_MAT
+        self.compile_to_npz = COMPILE_TO_NPZ
+        self.save_electrodes = SAVE_ELECTRODES
+        self.compile_waveforms = COMPILE_WAVEFORMS
+
+        self.rec_names = []
+        self.rec_channel_locations = dict()
+        self.rec_fs = dict()
+        self.rec_n_samples = dict()
+        self.rec_spike_times = dict()
+        self.rec_spike_clusters = dict()
+
+        self.neg = HalfCompiler(False)
+        self.pos = HalfCompiler(True)
+        self.halves = (self.neg, self.pos)
+
+        self.recs_cache = []  # Cache recordings so that they can be all added at once
+
+    def add_recording(self, rec_name, w_e):
+        """
+        Add recording to self.recs_cache to be added to compiler all together
+        when saving results
+
+        Parameters
+        ----------
+        rec_name: str
+            Name of the recording
+        w_e: WaveformExtractor
+            Result of recording
+        """
+        self.recs_cache.append((rec_name, w_e))
+
+    def _add_recording(self, rec_name, w_e):
+        """
+        Add units from sorted recording
+
+        Parameters
+        ----------
+        rec_name: str
+            Name of the recording
+        w_e: WaveformExtractor
+            Result of recording
+        """
+        self.rec_names.append(rec_name)
+        self.rec_channel_locations[rec_name] = w_e.recording.get_channel_locations()
+        self.rec_fs[rec_name] = w_e.recording.get_sampling_frequency()
+
+        curation_history = w_e.get_curation_history()
+        if curation_history is None:
+            unit_ids_all = w_e.sorting.unit_ids
+            unit_ids_curated = w_e.sorting.unit_ids
+        else:
+            unit_ids_curated = w_e.sorting.unit_ids
+            last_curation = curation_history["curations"][-1]
+            unit_ids_all = curation_history["curated"][last_curation] + curation_history["failed"][last_curation]
+
+        self.rec_n_samples[rec_name] = w_e.recording.get_num_samples()
+        curated_first_folder = w_e.folder.parent / "first"
+        if curated_first_folder.exists():
+            self.rec_spike_times[rec_name] = np.load(str(curated_first_folder / "spike_times.npy"), mmap_mode="r")
+            self.rec_spike_clusters[rec_name] = np.load(str(curated_first_folder / "spike_clusters.npy"), mmap_mode="r")
+        else:
+            self.rec_spikes_times[rec_name] = w_e.sorting.spike_times
+            self.rec_spike_clusters[rec_name] = w_e.sorting.spike_clusters
+
+        use_pos_peak = w_e.use_pos_peak
+        unit_ids_curated = set(unit_ids_curated)
+
+        rec_locations = w_e.recording.get_channel_locations()
+        if self.save_electrodes:
+            rec_electrodes = w_e.recording.get_property('electrode')
+
+        n_curated = 0
+        for unit_id in unit_ids_all:
+            is_curated = unit_ids_curated is None or unit_id in unit_ids_curated
+            unit = SortedUnit(unit_id, rec_name, w_e, is_curated)
+            if is_curated:
+                unit.spike_train = w_e.sorting.get_unit_spike_train(unit_id)
+                unit.x_max, unit.y_max = rec_locations[unit.chan_max]
+                if self.save_electrodes:
+                    unit.electrode = rec_electrodes[unit.chan_max]
+                n_curated += 1
+
+            if use_pos_peak[unit_id]:
+                self.pos.add_unit(unit)
+            else:
+                self.neg.add_unit(unit)
+
+        if self.create_figures:
+            self.bar_plot.add_recording(rec_name, len(unit_ids_all), n_curated)
+            if self.std_scatter is not None and curation_history is not None:
+                self.std_scatter.add_recording(rec_name,
+                                               curation_history["metrics"]["std_norm_max"], curation_history["metrics"]["spikes_min_second"])
+
+    def save_results(self, folder):
+        """
+        Save compiled results to folder
+
+        Parameters
+        ----------
+        folder: Path or str
+            Path to save compiled results to
+
+        Returns
+        -------
+        units_curated: list
+            List of SortedUnit containing curated units
+        """
+        create_folder(folder)
+
+        self.bar_plot = BarPlot()
+        if self.create_std_scatter_plot:
+            self.std_scatter = StdScatterPlot()
+        else:
+            self.std_scatter = None
+        self.templates_plot = TemplatesPlot()
+
+        if len(self.recs_cache) > 0:
+            print(f"Compiling results from {len(self.recs_cache)} recordings:")
+            for rec_name, w_e in self.recs_cache:
+                print(rec_name)
+                self._add_recording(rec_name, w_e)
+
+        compile_dict = None
+        if self.compile_to_mat or self.compile_to_npz:
+            if len(self.rec_names) == 1:
+                rec = self.rec_names[0]
+                compile_dict = {"units": [], "locations": self.rec_channel_locations[rec], "fs": self.rec_fs[rec]}
+
+        if COMPILE_WAVEFORMS:
+            create_folder(folder / "negative_peaks")
+            create_folder(folder / "positive_peaks")
+
+        for half in self.halves:
+            SortedUnit.sort_units(half.units)
+
+            sorted_index = 0
+            print(f"\nIterating through {len(half.units)} units with {'positive peaks' if half.has_pos_peak else 'negative peaks'}")
+            for unit in tqdm(half.units):
+                if unit.is_curated:
+                    unit.sorted_index = sorted_index
+                    sorted_index += 1
+
+                    if compile_dict is not None:
+                        unit_dict = {
+                            "unit_id": unit.unit_id,
+                            "spike_train": unit.spike_train,
+                            "x_max": unit.x_max,
+                            "y_max": unit.y_max,
+                            "template": unit.template,
+                            # Below are new (not in original conversion-to-matlab script)
+                            "sorted_index": unit.sorted_index,
+                            "max_channel_si": unit.chan_max,  # Max channel index (used for getting max waveforms and template)
+                            "max_channel_id": unit.chan_max_id,  # Max channel ID (used for getting channel from braingeneers ephys data loader)
+                            "peak_sign": "positive" if half.has_pos_peak else "negative",
+                        }
+                        if self.save_electrodes:
+                            unit_dict["electrode"] = unit.electrode
+                        compile_dict["units"].append(unit_dict)
+
+                    if COMPILE_WAVEFORMS:
+                        wf_parent_folder = folder / "positive_peaks" if half.has_pos_peak else folder / "negative_peaks"
+                        np.save(wf_parent_folder / f"waveforms_{unit.sorted_index}.npy", unit.waveforms)
+
+                if self.create_figures:
+                    if self.std_scatter is not None:
+                        self.std_scatter.add_unit(unit)
+                    self.templates_plot.add_unit(unit, has_pos_peak=half.has_pos_peak)
+
+        if compile_dict is not None:
+            if self.compile_to_mat:
+                savemat(folder / "sorted.mat", compile_dict)
+                print("Compiled results to .mat")
+            if self.compile_to_npz:
+                np.savez(folder / "sorted.npz", units=compile_dict["units"], locations=compile_dict["locations"], fs=compile_dict["fs"])
+                print("Compiled results to .npz")
+
+        np.save(folder / "spike_times.npy", self.concatenate_spike_times())
+        np.save(folder / "spike_clusters.npy", self.concatenate_spike_clusters())
+
+        parameters = KILOSORT_PARAMS
+        parameters["recording_files"] = self.rec_names
+        parameters["waveforms_ms_before"] = WAVEFORMS_MS_BEFORE
+        for var in ["N_JOBS", "TOTAL_MEMORY", "USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION",
+                    "FREQ_MIN", "FREQ_MAX",
+                    "WAVEFORMS_MS_AFTER", "POS_PEAK_THRESH", "MAX_WAVEFORMS_PER_UNIT",
+                    "CURATE_FIRST", "CURATE_SECOND",
+                    "FR_MIN", "ISI_VIOL_MAX", "SNR_MIN", "SPIKES_MIN_FIRST", "SPIKES_MIN_SECOND", "STD_NORM_MAX",
+                    "STD_AT_PEAK", "STD_OVER_WINDOW_MS_BEFORE", "STD_OVER_WINDOW_MS_AFTER", "COMPILED_WAVEFORMS_MS_BEFORE", "COMPILED_WAVEFORMS_MS_AFTER"]:
+            parameters[var.lower()] = globals()[var]
+        with open(folder / "parameters.json", "w") as f:
+            json.dump(parameters, f)
+
+        if self.create_figures:
+            figures_path = Path(folder) / "figures"
+            print("\nSaving figures")
+            create_folder(figures_path)
+            self.bar_plot.save(figures_path / "curation_bar_plot.png", verbose=True)
+            self.std_scatter.save(figures_path / "std_scatter_plot.png", verbose=True)
+            self.templates_plot.save(figures_path / "all_templates_plot.png", verbose=True)
+
+    def concatenate_spike_times(self):
+        """
+        Increment spike times as if the recordings added to the compiler are one long recording
+        in the order that the recordings were added
+
+        Returns
+        -------
+        concatenated_spike_times: np.array
+        """
+        concatenated_spike_times = np.array([])
+        increment = 0
+        for rec in self.rec_names:
+            concatenated_spike_times = np.concatenate((concatenated_spike_times, self.rec_spike_times[rec]+increment))
+            increment += self.rec_n_samples[rec]
+        return concatenated_spike_times
+
+    def concatenate_spike_clusters(self):
+        """
+        Concatenate the spike_clusters.npy of each recording as if the recordings added to the compiler are one long recording
+        in the order that the recordings were added
+
+        Returns
+        -------
+        concatenated_spike_clusters: np.array
+        """
+        return np.concatenate([self.rec_spike_clusters[rec] for rec in self.rec_names])
+
+
+class HalfCompiler:
+    """
+    Class to compile half of the compiled results
+    Functions with class Compiler
+    I.e. One HalfCompiler for negative peak data and another for positive peak data
+    """
+    def __init__(self, has_pos_peak):
+        """
+
+        Parameters
+        ----------
+        has_pos_peak: bool
+            Whether stores units with positive or negative peaks
+        """
+        self.units = []
+        self.has_pos_peak = has_pos_peak
+
+    def add_unit(self, unit):
+        """
+        Append unit to self._units_all
+
+        Parameters
+        ----------
+        unit: SortedUnit
+            Unit to add
+        """
+        self.units.append(unit)
+
+
+class SortedUnit:
+    """
+    Class to represent a sorted unit (has been detected by spike sorter)
+    Functions with class HalfCompiler to represent the units that
+    HalfCompiler will compile together
+    """
+    def __init__(self, unit_id, rec_name, w_e, is_curated):
+        """
+        Parameters
+        ----------
+        unit_id: int
+            The unit id of the unit in w_e
+        rec_name: str
+            Name of recording this unit comes from
+        w_e: WaveformExtractor
+            Result of sorting recording that corresponds with rec_name
+        is_curated: bool
+            Whether the unit is curated
+        """
+
+        self.rec_name = rec_name
+        self.sampling_frequency = w_e.sampling_frequency
+        self.is_curated = is_curated
+        self.unit_id = unit_id
+        self.chan_max = w_e.chans_max_all[unit_id]
+        self.chan_max_id = w_e.recording.get_channel_ids()[self.chan_max]
+
+        self.nbefore = w_e.ms_to_samples(COMPILED_WAVEFORMS_MS_BEFORE)
+        self.nafter = w_e.ms_to_samples(COMPILED_WAVEFORMS_MS_AFTER) + 1
+        self.peak_ind = self.nbefore
+
+        template = w_e.get_computed_template(unit_id=unit_id, mode="average")
+        self.template_full = template
+        self.template_full_peak = w_e.peak_ind
+
+        self.template = template[w_e.peak_ind-self.nbefore:w_e.peak_ind+self.nafter, :]
+        self.amplitude = np.abs(self.template[self.peak_ind, self.chan_max])
+
+        waveforms = w_e.get_waveforms(unit_id=unit_id)
+        self.waveforms = waveforms[:, w_e.peak_ind-self.nbefore:w_e.peak_ind+self.nafter, :]
+
+        self.sorted_index = None
+        self.spike_train = None
+        self.x_max = None
+        self.y_max = None
+        self.electrode = None
+
+    @staticmethod
+    def sort_units(units):
+        """
+        Sort units based on amplitude in descending order
+
+        Parameters
+        ----------
+        units: list
+            Contains instances of SortedUnit to be sorted
+        """
+        units.sort(key=lambda u: u.amplitude, reverse=True)
+
+
+class Figure:
+    """
+    Base class for creating 3 figures
+    """
+    name = "figure"
+
+    def __init__(self, **subplots_kwargs):
+        """
+        Parameters
+        ----------
+        subplots_kwargs:
+            Kwargs for plt.subplots
+        """
+        self.fig, self.axs = plt.subplots(**subplots_kwargs)
+
+    def save(self, save_path, verbose=True):
+        """
+        Save figure
+
+        Parameters
+        ----------
+        save_path: str or Path
+            Path to save the figure to
+        verbose: bool
+            Whether to print that figure has been saved
+        """
+        self.fig.savefig(save_path)
+        plt.close(self.fig)
+        if verbose:
+            print(f"{self.name.capitalize()} has been saved to {save_path}\n")
+
+
+class BarPlot(Figure):
+    """
+    Class for creating bar plot showing curation
+    """
+    name = "curation bar plot"
+
+    def __init__(self, **subplots_kwargs):
+        """
+        Parameters
+        ----------
+        subplots_kwargs:
+            Kwargs for plt.subplots
+        """
+        subplots_kwargs["nrows"] = 1
+        subplots_kwargs["ncols"] = 1
+        super().__init__(**subplots_kwargs)
+
+        self.total_label = BAR_TOTAL_LABEL
+        self.selected_label = BAR_SELECTED_LABEL
+        self.label_rotation = BAR_LABEL_ROTATION
+        self.x_label = BAR_X_LABEL
+        self.y_label = BAR_Y_LABEL
+        self.df = pd.DataFrame({self.total_label: [], self.selected_label: []}, index=[])
+
+    def add_recording(self, rec_name, n_total, n_selected):
+        """
+        Add recording to plot
+
+        Parameters
+        ----------
+        rec_name: str
+            Name of recording
+        n_total: int
+            Number of total units
+        n_selected: int
+            Number of selected ujnits
+        """
+        self.df.loc[rec_name] = [n_total, n_selected]
+
+    def save(self, save_path, verbose=True):
+        """
+        Save figure
+
+        Parameters
+        ----------
+        save_path: str or Path
+            Path to save the figure to
+        verbose: bool
+            Whether to print that figure has been saved
+        """
+        if verbose:
+            print(f"Saving {self.name}")
+
+        self.df.plot.bar(rot=self.label_rotation, ax=self.axs)
+        self.axs.set_xlabel(self.x_label)
+        self.axs.set_ylabel(self.y_label)
+        self.axs.legend(loc="upper right")
+        super().save(save_path)
+
+
+class StdScatterPlot(Figure):
+    """
+    Class for creating std scatter plot
+    """
+    name = "std scatter plot"
+
+    def __init__(self, **subplots_kwargs):
+        """
+        Parameters
+        ----------
+        subplots_kwargs:
+            Kwargs for plt.subplots
+        """
+        subplots_kwargs["nrows"] = 1
+        subplots_kwargs["ncols"] = 1
+        super().__init__(**subplots_kwargs)
+
+        self.unused_colors = SCATTER_RECORDING_COLORS[:]
+        self.alpha = SCATTER_RECORDING_ALPHA
+        self.axs.set_xlabel(SCATTER_X_LABEL)
+        self.axs.set_ylabel(SCATTER_Y_LABEL)
+        self.n_spikes_thresh = SPIKES_MIN_SECOND
+        self.std_thresh = STD_NORM_MAX
+        self.x_max_buffer = SCATTER_X_MAX_BUFFER
+        self.y_max_buffer = SCATTER_Y_MAX_BUFFER
+        self.thresh_line_kwargs = {"linestyle": "dotted", "linewidth": 1, "c": "#000000"}
+
+        self.loc_off_plot = (-1e4, -1e4)
+        self.std_max = -np.inf
+        self.n_spikes_max = -np.inf
+
+        self.rec_colors = dict()
+        self.rec_std_data = dict()
+        self.rec_n_spikes_data = dict()
+
+    def add_recording(self, rec_name, std_data, n_spikes_data):
+        """
+        Add recording to scatter plot
+
+        Parameters
+        ----------
+        rec_name: str
+            Name of recording to add
+        std_data: dict
+            Maps unit id to std
+        n_spikes_data:
+            Maps unit id to min spikes
+        """
+        if len(self.unused_colors) == 0:
+            print("Cannot add recording to std scatter plot because there are not enough unique colors to render a new recording")
+            return
+        color = self.unused_colors.pop(0)
+        self.axs.scatter(*self.loc_off_plot, c=color, label=rec_name)
+
+        self.rec_colors[rec_name] = color
+        self.rec_std_data[rec_name] = std_data
+        self.rec_n_spikes_data[rec_name] = n_spikes_data
+
+    def add_unit(self, unit):
+        """
+        Add unit to plot
+
+        Parameters
+        ----------
+        unit: SortedUnit
+            Unit to add to plot
+        """
+        rec_name = unit.rec_name
+        color = self.rec_colors[rec_name]
+        std = self.rec_std_data[rec_name][str(unit.unit_id)]
+        n_spikes = self.rec_n_spikes_data[rec_name][str(unit.unit_id)]
+        self.axs.scatter(n_spikes, std, c=color, alpha=self.alpha)
+
+        self.std_max = max(self.std_max, std)
+        self.n_spikes_max = max(self.n_spikes_max, n_spikes)
+
+    def save(self, save_path, verbose=True):
+        """
+        Save figure
+
+        Parameters
+        ----------
+        save_path: str or Path
+            Path to save the figure to
+        verbose: bool
+            Whether to print that figure has been saved
+        """
+        if verbose:
+            print(f"Saving {self.name}")
+
+        x_max = self.n_spikes_max + self.x_max_buffer
+        y_max = self.std_max + self.y_max_buffer
+
+        # Vertical line for min spikes threshold
+        self.axs.axvline(self.n_spikes_thresh, **self.thresh_line_kwargs)
+        self.axs.text(self.n_spikes_thresh, y_max, self.n_spikes_thresh, horizontalalignment="center")
+        # Horizontal line for max norm std threshold
+        self.axs.axhline(self.std_thresh, **self.thresh_line_kwargs)
+        self.axs.text(x_max, self.std_thresh, self.std_thresh, verticalalignment="center")
+
+        self.axs.set_xlim(0, x_max)
+        self.axs.set_ylim(0, y_max)
+
+        if len(self.rec_colors) > 1:
+            self.axs.legend(loc="upper right")
+
+        super().save(save_path)
+
+
+class TemplatesPlot(Figure):
+    name = "all templates plot"
+
+    def __init__(self, **subplots_kwargs):
+        """
+        Parameters
+        ----------
+        subplots_kwargs:
+            Kwargs for plt.subplots
+        """
+        self.n_templates_per_col = ALL_TEMPLATES_PER_COLUMN
+        self.y_spacing = ALL_TEMPLATES_Y_SPACING
+        self.color_curated = ALL_TEMPLATES_COLOR_CURATED
+        self.color_failed = ALL_TEMPLATES_COLOR_FAILED
+        self.window = [-ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK, ALL_TEMPLATES_WINDOW_MS_AFTER_PEAK]
+        self.line_after = ALL_TEMPLATES_LINE_MS_AFTER_PEAK
+        self.line_before = ALL_TEMPLATES_LINE_MS_BEFORE_PEAK
+        self.line_kwargs = {"color": "black", "linestyle": "dotted"}
+        self.xlabel = ALL_TEMPLATES_X_LABEL
+
+        self.units_neg = []
+        self.units_pos = []
+
+        subplots_kwargs["nrows"] = 1
+        self.subplots_kwargs = subplots_kwargs
+
+    def add_unit(self, unit, has_pos_peak):
+        """
+        Add unit to plot
+
+        Parameters
+        ----------
+        unit: SortedUnit
+            Unit to add to plot
+        has_pos_peak: bool
+            Whether the unit has a positive peak
+        """
+        if has_pos_peak:
+            self.units_pos.append(unit)
+        else:
+            self.units_neg.append(unit)
+
+    def save(self, save_path, verbose=True, units_are_sorted=True):
+        """
+        Save figure
+
+        Parameters
+        ----------
+        save_path: str or Path
+            Path to save the figure to
+        verbose: bool
+            Whether to print that figure has been saved
+        units_are_sorted: bool
+            If False, units will be sorted based on amplitude in descending order
+            If True, units will not be sorted since it will be assumed that they were sorted
+            when added using :meth add_unit
+        """
+        if verbose:
+            print(f"Saving {self.name}")
+
+        # Create subplots
+        n_col_neg = ceil(len(self.units_neg) / self.n_templates_per_col)
+        n_col_pos = ceil(len(self.units_pos) / self.n_templates_per_col)
+        n_cols = n_col_neg + n_col_pos
+
+        self.subplots_kwargs["ncols"] = n_cols
+        self.subplots_kwargs["figsize"] = (n_cols * 3, self.n_templates_per_col / 6)
+        self.subplots_kwargs["tight_layout"] = True
+        super().__init__(**self.subplots_kwargs)
+        fig, axs = self.fig, self.axs
+        axs = np.atleast_1d(axs)
+
+        # Sort units if not already sorted
+        if not units_are_sorted:
+            SortedUnit.sort_units(self.units_neg)
+            SortedUnit.sort_units(self.units_pos)
+
+        # Plot templates
+        subplot_i = 0
+        for units in (self.units_neg, self.units_pos):
+            y_offset = 0
+            count = 0
+            for unit in units:  # type: SortedUnit
+                template = unit.template_full[:, unit.chan_max]
+                x_cords = np.arange(template.size) - unit.template_full_peak
+                x_cords = (x_cords / unit.sampling_frequency) * 1000.
+                axs[subplot_i].plot(x_cords, template-y_offset,
+                                    color=self.color_curated if unit.is_curated else self.color_failed)
+                y_offset += self.y_spacing
+                count += 1    
+                if count == self.n_templates_per_col:
+                    subplot_i += 1
+                    y_offset = 0
+                    count = 0
+            subplot_i = n_col_neg
+        
+        # Plot vertical lines in each axis and set limits and labels
+        y_lim = None
+        for i, ax in enumerate(axs):  # type: int, axes.Axes
+            ax.set_xlim(*self.window)
+            ax.set_xticks(self.window + [0])
+            ax.set_xlabel(self.xlabel)
+
+            ax.set_yticks([])
+            if y_lim is None or i == n_col_neg:
+                y_lim = ax.get_ylim()
+            else:
+                ax.set_ylim(*y_lim)
+
+            if self.line_before is not None:
+                ax.axvline(-self.line_before, **self.line_kwargs)
+            if self.line_after is not None:
+                ax.axvline(self.line_after, **self.line_kwargs)
+        super().save(save_path, verbose)
+
+
+def create_folder(folder, parents=True):
+    folder = Path(folder)
+    if not folder.exists():
+        folder.mkdir(parents=parents)
+        print(f"Created folder: {folder}")
+
+
+def delete_folder(folder):
+    folder = Path(folder)
+    if folder.exists():
+        shutil.rmtree(folder)
+        print(f"Deleted folder: {folder}")
 
 
 def load_raw_recording(rec_path):
@@ -3215,22 +3887,26 @@ def concatenate_recordings(rec_path):
     return rec
 
 
-def get_paths(rec_path, inter_path):
+def get_paths(rec_path, inter_path, results_path):
     print_stage("PROCESSING RECORDING")
     print(f"Recording path: {rec_path}")
     print(f"Intermediate results path: {inter_path}")
+    print(f"Compiled results path: {results_path}")
 
     rec_path = Path(rec_path)
     rec_name = rec_path.name.split(".")[0]
 
     inter_path = Path(inter_path)
 
-    recording_dat_path = inter_path / (rec_name + "_filtered.dat")
-    recording_saved_path = inter_path / (rec_name + "_filtered")
+    recording_dat_path = inter_path / "recording" / (rec_name + "_filtered.dat")
+    recording_saved_path = inter_path / "recording" / (rec_name + "_filtered")
     output_folder = inter_path / 'kilosort2_results'
     waveforms_root_folder = inter_path / 'waveforms'
-    curation_first_folder = waveforms_root_folder / 'curation_first'
-    curation_second_folder = waveforms_root_folder / 'curation_second'
+    curation_folder = inter_path / 'curation'
+    curation_initial_folder = curation_folder / 'initial'
+    curation_first_folder = curation_folder / 'first'
+    curation_second_folder = curation_folder / 'second'
+    results_path = Path(results_path)
 
     delete_folders = []
     if RECOMPUTE_RECORDING:
@@ -3239,23 +3915,22 @@ def get_paths(rec_path, inter_path):
         delete_folders.extend((output_folder, waveforms_root_folder))
     if REEXTRACT_WAVEFORMS:
         delete_folders.append(waveforms_root_folder)
+        delete_folders.append(curation_folder)
     if RECURATE_FIRST:
         delete_folders.append(curation_first_folder)
         delete_folders.append(curation_second_folder)
     if RECURATE_SECOND:
         delete_folders.append(curation_second_folder)
     for folder in delete_folders:
-        if folder.exists():
-            shutil.rmtree(folder)
-            print(f"Deleted folder: {folder}")
+        delete_folder(folder)
 
-    global REEXPORT_MAT, REEXPORT_NPZ, RECOMPILE_RESULTS
-    REEXPORT_MAT = REEXPORT_MAT or len(delete_folders) > 1
-    REEXPORT_NPZ = REEXPORT_NPZ or REEXPORT_MAT
-    RECOMPILE_RESULTS = RECOMPILE_RESULTS or REEXPORT_MAT
+    if len(delete_folders) > 0:
+        delete_folder(results_path)
+        global RECOMPILE_ALL_RECORDINGS
+        RECOMPILE_ALL_RECORDINGS = True
 
     create_folder(inter_path)
-    return rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_first_folder, curation_second_folder
+    return rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_initial_folder, curation_first_folder, curation_second_folder, results_path
 
 
 def write_recording(recording, recording_saved_path, recording_dat_path, verbose=True):
@@ -3310,7 +3985,7 @@ def spike_sort(rec_cache, rec_path, recording_dat_path, output_folder):
     return sorting
 
 
-def extract_waveforms(recording_path, recording, sorting, root_folder, **job_kwargs):
+def extract_waveforms(recording_path, recording, sorting, root_folder, initial_folder, **job_kwargs):
     """
     Extracts waveform on paired Recording-Sorting objects.
     Waveforms are persistent on disk and cached in memory.
@@ -3324,7 +3999,9 @@ def extract_waveforms(recording_path, recording, sorting, root_folder, **job_kwa
     sorting: Sorting
         The sorting object
     root_folder: Path
-        The root folder of wavaeforms
+        The root folder of waveforms
+    initial_folder: Path
+        Folder representing units before curation
 
     Returns
     -------
@@ -3337,11 +4014,11 @@ def extract_waveforms(recording_path, recording, sorting, root_folder, **job_kwa
 
     if not REEXTRACT_WAVEFORMS and (root_folder / "waveforms").is_dir():  # Load saved waveform extractor
         print("Loading waveforms from folder")
-        we = WaveformExtractor.load_from_folder(recording, sorting, root_folder, root_folder / "initial")
+        we = WaveformExtractor.load_from_folder(recording, sorting, root_folder, initial_folder)
         # we.compute_templates(mode=("average", "std"))
         stopwatch.log_time("Done extracting waveforms.")
     else:  # Create new waveform extractor
-        we = WaveformExtractor.create_root(recording_path, recording, sorting, root_folder)
+        we = WaveformExtractor.create_initial(recording_path, recording, sorting, root_folder, initial_folder)
         we.run_extract_waveforms(**job_kwargs)
         stopwatch.log_time("Done extracting waveforms.")
 
@@ -3370,7 +4047,6 @@ def curate(we_raw, waveforms_root_folder, curation_first_folder, curation_second
         "failed": dict(),
         "metrics": dict(),
     }
-
     we_curated_first, curation_history = curate_first(we_raw, curation_history, waveforms_root_folder, curation_first_folder)
     we_curated_second = curate_second(we_curated_first, curation_history, waveforms_root_folder, curation_second_folder)
     return we_curated_second
@@ -3461,8 +4137,9 @@ def curate_first(we_raw, curation_history, waveforms_root_folder, curation_first
         print(f"N units after min spikes curation: {len(unit_ids_curated)}")
 
     # Save only the curated waveforms to a new folder
-    sorting.unit_ids = list(unit_ids_curated)
-    we_curated = we_raw.save_curated_units(waveforms_root_folder=waveforms_root_folder, curated_folder=curation_first_folder, curation_history=curation_history)
+    unit_ids_curated = list(unit_ids_curated)
+    curation_history["curated_first"] = unit_ids_curated
+    we_curated = we_raw.save_curated_units(unit_ids_curated, waveforms_root_folder=waveforms_root_folder, curated_folder=curation_first_folder, curation_history=curation_history)
     return we_curated, curation_history
 
 
@@ -3523,17 +4200,15 @@ def curate_second(we_raw, curation_history, waveforms_root_folder, curation_seco
         print(f"N units after norm std curation: {len(unit_ids_curated)}")
 
     # Save only the curated waveforms to a new folder
-    sorting.unit_ids = [int(u) for u in unit_ids_curated]
-    we_curated = we_raw.save_curated_units(waveforms_root_folder=waveforms_root_folder, curated_folder=curation_second_folder, curation_history=curation_history)
+    unit_ids_curated = list(unit_ids_curated)
+    curation_history["curated_second"] = unit_ids_curated
+    we_curated = we_raw.save_curated_units(unit_ids_curated, waveforms_root_folder=waveforms_root_folder, curated_folder=curation_second_folder, curation_history=curation_history)
     return we_curated
 
 
-def process_recording(rec_path, inter_path):
-    # Start time for entire process
-    stopwatch = Stopwatch()
-
+def process_recording(rec_name, rec_path, inter_path, results_path):
     # Get Paths
-    rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_first_folder, curation_second_folder = get_paths(rec_path, inter_path)
+    rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_initial_folder, curation_first_folder, curation_second_folder, results_path = get_paths(rec_path, inter_path, results_path)
 
     # Save a copy of the script
     if SAVE_SCRIPT:
@@ -3558,16 +4233,16 @@ def process_recording(rec_path, inter_path):
         return "Could not sort recording. Moving on to next recording"
 
     # Extract waveforms
-    we_raw = extract_waveforms(rec_path, recording_filtered, sorting, waveforms_root_folder,
-                               n_jobs=N_JOBS, total_memory=TOTAL_MEMORY, progress_bar=True)
+    w_e_raw = extract_waveforms(rec_path, recording_filtered, sorting, waveforms_root_folder, curation_initial_folder,
+                                n_jobs=N_JOBS, total_memory=TOTAL_MEMORY, progress_bar=True)
 
     # Curating data
-    waveform_extractor = curate(we_raw, waveforms_root_folder, curation_first_folder, curation_second_folder)
+    w_e_curated = curate(w_e_raw, waveforms_root_folder, curation_first_folder, curation_second_folder)
 
-    print_stage("DONE EXTRACTING DATA FROM RECORDING")
-    stopwatch.log_time("Total")
+    # Compile results
+    compile_results(rec_name, rec_path, results_path, w_e_curated)
 
-    return waveform_extractor
+    return w_e_curated
 
 
 def export_results(waveform_extractor, rec_name, results_path):
@@ -3584,7 +4259,7 @@ def export_results(waveform_extractor, rec_name, results_path):
 
     skip = 0
     if mat_file.exists():
-        if REEXPORT_MAT:
+        if True:  # REEXPORT_MAT
             mat_file.unlink()
             print(f"Deleted {mat_file}")
         else:
@@ -3592,7 +4267,7 @@ def export_results(waveform_extractor, rec_name, results_path):
             skip += 1
 
     if npz_file.exists():
-        if REEXPORT_NPZ:
+        if True:  # REEXPORT_NPZ
             npz_file.unlink()
             print(f"Deleted {npz_file}")
         else:
@@ -3654,308 +4329,7 @@ def copy_script(path):
     print(f"Saved a copy of script to {copied_path}")
 
 
-def create_figures(rec_names, waveform_extractors):
-    total_stopwatch = Stopwatch("CREATING FIGURES")
-
-    if FIGURES_DPI is not None:
-        mpl.rcParams["figure.dpi"] = FIGURES_DPI
-    if FIGURES_FONT_SIZE is not None:
-        mpl.rcParams["font.size"] = FIGURES_FONT_SIZE
-
-    if not CREATE_FIGURES:
-        print("'CREATE_FIGURES' is set to False, so figures will not be created")
-        return
-
-    if len(rec_names) == 0:
-        print("Skipping creating figures because no recording was analyzed without errors")
-        return
-
-    save_folder = Path(COMPILED_RESULTS_FOLDER) / "figures"
-
-    create_folder(save_folder)
-
-    print(f"Plotting data from the following recordings: {', '.join(rec_names)}")
-
-    bar_data_n_total = []
-    bar_data_n_curated = []
-
-    scatter_data = [
-        [],  # n_spikes
-        [],  # std
-        [],  # color
-    ]
-    scatter_n_spikes_max = 0
-    scatter_std_norm_max = 0
-    scatter_legend_colors = []
-
-    peak_ind = None
-
-    templates_neg_is_curated = np.array([])
-    templates_neg_amplitudes = np.array([])
-    templates_neg = []
-    templates_neg_recordings = np.array([])
-    templates_neg_unit_ids = np.array([])
-
-    templates_pos_is_curated = np.array([])
-    templates_pos_amplitudes = np.array([])
-    templates_pos_recordings = np.array([])
-    templates_pos_unit_ids = np.array([])
-    templates_pos = []
-
-    extract_data_stopwatch = Stopwatch()
-    for i, (rec_name, w_e) in enumerate(zip(rec_names, waveform_extractors)):
-        print_stage("EXTRACTING PLOTTING DATA")
-        print(f"from {rec_name}")
-
-        if peak_ind is None:
-            peak_ind = w_e.peak_ind
-        else:
-            assert peak_ind == w_e.peak_ind, "Waveforms were extracted with different parameters. Reextract waveforms using the same parameters for each recording"
-
-        curation_history = w_e.get_curation_history()
-
-        key_curation_final = curation_history["curations"][-1]
-
-        if CURATE_SECOND:
-            stopwatch = Stopwatch("\nGetting data for curation bar plot", use_print_stage=False)
-            n_total = len(curation_history["metrics"][key_curation_final])
-            n_curated = len(w_e.sorting.unit_ids)
-            bar_data_n_total.append(n_total)
-            bar_data_n_curated.append(n_curated)
-            stopwatch.log_time("Done.")
-        else:
-            print("\nSkipping creating curation bar plot because 'CURATE_SECOND' is set to False")
-
-        if CURATE_SECOND and SPIKES_MIN_SECOND is not None and STD_NORM_MAX is not None:
-            stopwatch = Stopwatch("\nGetting data for std scatter plot", use_print_stage=False)
-            n_spikes = curation_history["metrics"]["spikes_min_second"].values()
-            stds = curation_history["metrics"]["std_norm_max"].values()
-            color = SCATTER_RECORDING_COLORS.pop(0)
-
-            if SCATTER_STD_MAX_UNITS_PER_RECORDING is not None:
-                n_units = len(n_spikes)
-                if SCATTER_STD_MAX_UNITS_PER_RECORDING < n_units:
-                    random_sample = np.random.choice(n_units, replace=False, size=SCATTER_STD_MAX_UNITS_PER_RECORDING)
-                    n_spikes = np.asarray(n_spikes)[random_sample].tolist()
-                    stds = np.asarray(stds)[random_sample].tolist()
-            scatter_n_spikes_max = np.max((scatter_n_spikes_max, *n_spikes))
-            scatter_std_norm_max = np.max((scatter_std_norm_max, *stds))
-            scatter_data[0].extend(n_spikes)
-            scatter_data[1].extend(stds)
-            scatter_data[2].extend(len(n_spikes) * [color])
-            scatter_legend_colors.append((rec_name, color))
-            stopwatch.log_time("Done.")
-        else:
-            print("\nSkipping creating std scatter plot because")
-            print("'CURATE_SECOND' is False OR 'SPIKES_MIN_SECOND' is None OR 'STD_NORM_MAX' is None")
-
-        stopwatch = Stopwatch("\nGetting data for plotting all templates", use_print_stage=False)
-        unit_ids_curated = curation_history["curated"][key_curation_final]
-        unit_ids_failed = curation_history["failed"][key_curation_final]
-        all_unit_ids = unit_ids_curated + unit_ids_failed
-
-        use_pos_peak = w_e.use_pos_peak[all_unit_ids]
-        i_pos_peak = np.flatnonzero(use_pos_peak)
-        i_neg_peak = np.flatnonzero(use_pos_peak == 0)
-
-        templates = np.atleast_2d(w_e.get_computed_template(np.arange(np.max(all_unit_ids)+1), mode="average")[all_unit_ids, :, w_e.chans_max_all[all_unit_ids]])  # (n_templates, n_samples)
-        is_curated = np.array([1] * len(unit_ids_curated) + [0] * len(unit_ids_failed))
-        amplitudes = np.abs(templates[:, peak_ind])
-
-        templates_pos.append(np.atleast_2d(templates[i_pos_peak, :]))
-        templates_pos_is_curated = np.concatenate((templates_pos_is_curated, is_curated[i_pos_peak]))
-        templates_pos_amplitudes = np.concatenate((templates_pos_amplitudes, amplitudes[i_pos_peak]))
-        templates_pos_recordings = np.concatenate((templates_pos_recordings, [rec_name]*i_pos_peak.size))
-        templates_pos_unit_ids = np.concatenate((templates_pos_unit_ids, np.asarray(all_unit_ids)[i_pos_peak]))
-
-        templates_neg.append(np.atleast_2d(templates[i_neg_peak, :]))
-        templates_neg_is_curated = np.concatenate((templates_neg_is_curated, is_curated[i_neg_peak]))
-        templates_neg_amplitudes = np.concatenate((templates_neg_amplitudes, amplitudes[i_neg_peak]))
-        templates_neg_recordings = np.concatenate((templates_neg_recordings, [rec_name]*i_neg_peak.size))
-        templates_neg_unit_ids = np.concatenate((templates_neg_unit_ids, np.asarray(all_unit_ids)[i_neg_peak]))
-
-        stopwatch.log_time("Done.")
-    templates_pos = np.concatenate(templates_pos, axis=0)
-    templates_neg = np.concatenate(templates_neg, axis=0)
-    print_stage("DONE EXTRACTING DATA FROM ALL RECORDINGS")
-    extract_data_stopwatch.log_time("Total")
-
-    print_stage("PLOTTING DATA")
-    if CURATE_SECOND:
-        stopwatch = Stopwatch("Plotting bar plot", use_print_stage=False)
-        df = pd.DataFrame({"First Curation": bar_data_n_total,
-                           "Second Curation": bar_data_n_curated},
-                          index=rec_names)
-        df.plot.bar(rot=BAR_LABEL_ROTATION)
-        plt.xlabel(BAR_X_LABEL)
-        plt.ylabel(BAR_Y_LABEL)
-        plt.legend(loc="upper right")
-        fig_path = save_folder / "curation_bar_plot.png"
-        plt.savefig(fig_path)
-        plt.clf()
-        print(f"Saved curation bar plot figure to {fig_path}")
-        stopwatch.log_time("Done.")
-
-    if CURATE_SECOND and SPIKES_MIN_SECOND is not None and STD_NORM_MAX is not None:
-        stopwatch = Stopwatch("\nPlotting std scatter plot", use_print_stage=False)
-        x_max = scatter_n_spikes_max + SCATTER_X_MAX_BUFFER
-        y_max = scatter_std_norm_max + SCATTER_Y_MAX_BUFFER
-
-        # Plot data
-        indices = np.arange(len(scatter_data[0]))
-        np.random.shuffle(indices)
-        n_spikes = np.asarray(scatter_data[0])[indices]
-        stds = np.asarray(scatter_data[1])[indices]
-        colors = np.asarray(scatter_data[2])[indices]
-        plt.scatter(n_spikes, np.abs(stds), c=colors, alpha=SCATTER_RECORDING_ALPHA)
-
-        threshold_lines_kwargs = {"linestyle": "dotted", "linewidth": 1, "c": "#000000"}
-        # Threshold for minimum spikes per unit line
-        plt.axvline(SPIKES_MIN_SECOND, **threshold_lines_kwargs)
-        plt.text(SPIKES_MIN_SECOND, y_max, SPIKES_MIN_SECOND, horizontalalignment="center")
-        # Threshold for maximum norm std line
-        plt.axhline(STD_NORM_MAX, **threshold_lines_kwargs)
-        plt.text(x_max, STD_NORM_MAX, STD_NORM_MAX, verticalalignment="center")
-
-        # Set labels
-        plt.xlim(0, x_max)
-        plt.ylim(0, y_max)
-        plt.xlabel(SCATTER_X_LABEL)
-        plt.ylabel(SCATTER_Y_LABEL)
-
-        # Create legend
-        off_screen = (-1e4, -1e4)
-        for name, c in scatter_legend_colors:
-            plt.scatter(*off_screen, c=c, label=name)
-        plt.legend(loc="upper right")
-        fig_path = save_folder / "std_scatter_plot.png"
-        plt.savefig(fig_path)
-        plt.clf()
-        print(f"Saved std scatter plot figure to {fig_path}")
-        stopwatch.log_time("Done.")
-
-    stopwatch = Stopwatch("\nSorting amplitudes", use_print_stage=False)
-    i_pos_sorted = np.argsort(-templates_pos_amplitudes)  # "-" is to sort by descending order
-    i_neg_sorted = np.argsort(-templates_neg_amplitudes)
-    print("Done sorting amplitudes")
-
-    n_units_pos = i_pos_sorted.size
-    n_units_neg = i_neg_sorted.size
-    n_columns_pos = ceil(n_units_pos / ALL_TEMPLATES_PER_COLUMN)
-    n_columns_neg = ceil(n_units_neg / ALL_TEMPLATES_PER_COLUMN)
-    n_columns_total = n_columns_pos + n_columns_neg
-
-    fig, subplots = plt.subplots(1, n_columns_total, figsize=(n_columns_total*3, ALL_TEMPLATES_PER_COLUMN / 6), tight_layout=True)
-    subplots = np.atleast_1d(subplots)
-
-    y_increment = 0
-    count = 0
-    subplot_i = n_columns_neg
-    y_max_pos = -np.inf
-    y_min_pos = np.inf
-    print("Plotting templates with positive peaks")
-    for index in i_pos_sorted:
-        # print(templates_pos_recordings[index], templates_pos_unit_ids[index])
-
-        template = templates_pos[index, :]
-        template -= y_increment  # This also changes the values of templates_pos since slicing returns a reference
-
-        if templates_pos_is_curated[index]:
-            color = ALL_TEMPLATES_COLOR_CURATED
-        else:
-            color = ALL_TEMPLATES_COLOR_FAILED
-        subplots[subplot_i].plot(template, c=color)
-
-        y_increment += ALL_TEMPLATES_Y_DISTANCE
-        count += 1
-
-        if count == ALL_TEMPLATES_PER_COLUMN:
-            subplot_i += 1
-            y_increment = 0
-            count = 0
-
-        y_max_pos = np.max((y_max_pos, *template))
-        y_min_pos = np.min((y_min_pos, *template))
-
-    print("Plotting templates with negative peaks")
-    y_increment = 0
-    count = 0
-    subplot_i = 0
-    y_max_neg = -np.inf
-    y_min_neg = np.inf
-    for index in i_neg_sorted:
-        template = templates_neg[index, :]
-        template -= y_increment
-
-        if templates_neg_is_curated[index]:
-            color = ALL_TEMPLATES_COLOR_CURATED
-        else:
-            color = ALL_TEMPLATES_COLOR_FAILED
-
-        # Get recording and unit_id of specific waveform in plot
-        # unit_id = templates_neg_unit_ids[index]
-        # rec = templates_neg_recordings[index]
-        # if (rec, int(unit_id)) in {("2953", 126), ("2953", 10), ("2953", 93)}:
-        #     print(rec, unit_id, subplot_i, count, templates_neg_is_curated[index])
-        #     color = "blue"
-
-        subplots[subplot_i].plot(template, c=color)
-
-        y_increment += ALL_TEMPLATES_Y_DISTANCE
-        count += 1
-
-        if count == ALL_TEMPLATES_PER_COLUMN:
-            subplot_i += 1
-            y_increment = 0
-            count = 0
-
-        y_max_neg = np.max((y_max_neg, *template))
-        y_min_neg = np.min((y_min_neg, *template))
-
-    lines_x_values = []
-    if ALL_TEMPLATES_LINE_MS_BEFORE_PEAK is not None:
-        if ALL_TEMPLATES_LINE_MS_BEFORE_PEAK > WAVEFORMS_MS_BEFORE:
-            offset = -w_e.peak_ind
-            print("'ALL_TEMPLATES_LINE_MS_BEFORE_PEAK' is greater than 'WAVEFORMS_MS_BEFORE', so 'WAVEFORMS_MS_BEFORE' will be used for the plotting window instead")
-        else:
-            offset = -w_e.ms_to_samples(ALL_TEMPLATES_LINE_MS_BEFORE_PEAK)
-        lines_x_values.append(peak_ind + offset)
-    if ALL_TEMPLATES_LINE_MS_AFTER_PEAK is not None:
-        if ALL_TEMPLATES_LINE_MS_AFTER_PEAK > WAVEFORMS_MS_AFTER:
-            offset = w_e.nafter
-            print("'ALL_TEMPLATES_LINE_MS_AFTER_PEAK' is greater than 'WAVEFORMS_MS_AFTER', so 'WAVEFORMS_MS_AFTER' will be used for the plotting window instead")
-        else:
-            offset = w_e.ms_to_samples(ALL_TEMPLATES_LINE_MS_AFTER_PEAK)
-        lines_x_values.append(peak_ind + offset)
-
-    for i, ax in enumerate(subplots):  # type: axes.Axes
-        if i < n_columns_neg:
-            ax.set_ylim(y_min_neg-ALL_TEMPLATES_Y_LIM_BUFFER, y_max_neg+ALL_TEMPLATES_Y_LIM_BUFFER)
-        else:
-            ax.set_ylim(y_min_pos-ALL_TEMPLATES_Y_LIM_BUFFER, y_max_pos+ALL_TEMPLATES_Y_LIM_BUFFER)
-        ax.set_yticks([])
-
-        ms_before = min(ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK, WAVEFORMS_MS_BEFORE)
-        ms_after = min(ALL_TEMPLATES_WINDOW_MS_AFTER_PEAK, WAVEFORMS_MS_AFTER)
-        x_min = peak_ind - w_e.ms_to_samples(ms_before)
-        x_max = peak_ind + w_e.ms_to_samples(ms_after)
-        ax.vlines(lines_x_values, *ax.get_ylim(), colors="black", linestyles="dotted")
-
-        ax.set_xticks([x_min, peak_ind, x_max], [-ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK, 0, ALL_TEMPLATES_WINDOW_MS_AFTER_PEAK])
-        ax.set_xlim(x_min, x_max)
-        ax.set_xlabel(ALL_TEMPLATES_X_LABEL)
-
-    fig_path = save_folder / "all_templates_plot.png"
-    plt.savefig(fig_path)
-    plt.clf()
-    print(f"Saved all templates figure to {fig_path}")
-    stopwatch.log_time("Done.")
-
-    print_stage("DONE CREATING ALL FIGURES")
-    total_stopwatch.log_time("Total")
-
-
-def compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_extractors):
+def old_compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_extractors):
     compile_stopwatch = Stopwatch("COMPILING RESULTS")
     compiled_folder = Path(COMPILED_RESULTS_FOLDER)
 
@@ -3963,16 +4337,16 @@ def compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_ex
         print("Skipping creating figures because no recording was analyzed without errors")
         return
 
-    if compiled_folder.exists():
-        if RECOMPILE_RESULTS:
-            shutil.rmtree(compiled_folder)
-        else:
-            print("Skipping compiling results because already compiled")
-            return
+    # if compiled_folder.exists():
+    #     if RECOMPILE_RESULTS:
+    #         shutil.rmtree(compiled_folder)
+    #     else:
+    #         print("Skipping compiling results because already compiled")
+    #         return
 
-    if not COMPILE_RESULTS:
-        print(f"Skipping compiling results since 'COMPILE_RESULTS' is set to False")
-        return
+    # if not COMPILE_RESULTS:
+    #     print(f"Skipping compiling results since 'COMPILE_RESULTS' is set to False")
+    #     return
 
     compiled_folder = Path(COMPILED_RESULTS_FOLDER)
     create_folder(compiled_folder)
@@ -4145,32 +4519,58 @@ def compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_ex
     compile_stopwatch.log_time("\nDone compiling results. Total")
 
 
+def compile_results(rec_name, rec_path, results_path, w_e):
+    compile_stopwatch = Stopwatch("COMPILING RESULTS")
+    print(f"For recording: {rec_path}")
+    if COMPILE_SINGLE_RECORDING:
+        if not results_path.exists() or RECOMPILE_SINGLE_RECORDING:
+            delete_folder(results_path)
+            print(f"Saving to path: {results_path}")
+            compiler = Compiler()
+            compiler.add_recording(rec_name, w_e)
+            compiler.save_results(results_path)
+            compile_stopwatch.log_time("Done compiling results.")
+        else:
+            print("Skipping compiling results because 'RECOMPILE_SINGLE_RECORDING' is set to False and already compiled")
+    else:
+        print(f"Skipping compiling results because 'COMPILE_SINGLE_RECORDING' is set to False")
+
+
 def main():
-    compiled_rec_paths = []
-    compiled_rec_names = []
-    compiled_waveform_extractors = []
+    compiled_results_folder = Path(COMPILED_RESULTS_FOLDER)
+    if COMPILE_ALL_RECORDINGS:
+        if not compiled_results_folder.exists() or RECOMPILE_ALL_RECORDINGS:
+            all_recs_compiler = Compiler()
+        else:
+            all_recs_compiler = "Skipping compiling results from all recordings because 'RECOMPILE_ALL_RECORDINGS' is set to False and already compiled"
+    else:
+        all_recs_compiler = "Skipping compiling results from all recordings because 'COMPILE_ALL_RECORDINGS' is set to False"
 
     for (rec_path, inter_path, results_path) in zip(RECORDING_FILES, INTERMEDIATE_FOLDERS, RESULTS_FOLDERS):
         stopwatch = Stopwatch()
-        result = process_recording(rec_path, inter_path)
-        if type(result) == str:
-            print(result)
-            continue
-
         rec_name = str(rec_path).split(r"/")[-1].split(".")[0]
-
-        export_results(result, rec_name, results_path)
+        w_e = process_recording(rec_name, rec_path, inter_path, results_path)
+        if type(w_e) == str:
+            print(w_e)
+            continue
 
         print_stage(f"DONE WITH RECORDING")
         print(f"Recording: {rec_path}")
         stopwatch.log_time("Total")
 
-        compiled_rec_paths.append(rec_path)
-        compiled_rec_names.append(rec_name)
-        compiled_waveform_extractors.append(result)
+        if type(all_recs_compiler) == Compiler:
+            # To conserve RAM: Replace w_e with a list containing path to saved recording, folder containing kilosort results, folder for root waveforms, and folder for w_e
+            #                  Then write a new method for WaveformExtractor to load completely from folder paths (instead of passing a recording and sorting object)
+            all_recs_compiler.add_recording(rec_name, w_e)
 
-    compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_extractors)
-    create_figures(compiled_rec_names, compiled_waveform_extractors)
+    stopwatch = Stopwatch("COMPILING DATA FROM ALL RECORDINGS")
+    if type(all_recs_compiler) == Compiler:
+        delete_folder(compiled_results_folder)
+        all_recs_compiler.save_results(compiled_results_folder)
+        print_stage("DONE COMPILING DATA FROM ALL RECORDINGS")
+        stopwatch.log_time()
+    else:
+        print(all_recs_compiler)
 
 
 if __name__ == "__main__":
