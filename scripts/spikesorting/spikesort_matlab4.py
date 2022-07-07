@@ -7,31 +7,38 @@
 # If path is a folder with multiple recording files,
 # they will be concatenated in natural ordering.
 RECORDING_FILES = [
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/data.raw.h5"
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/data.raw.h5"
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
+    # "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
 
 ]
 # List of intermediate folders where Kilosort2 sorting results, raw waveforms, and curation data are saved
 INTERMEDIATE_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/dated/220704/2950",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2953",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2954",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2957",
-    "/home/maxlim/SpikeSorting/data/dated/220704/5116",
-    "/home/maxlim/SpikeSorting/data/dated/220704/5118",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706"
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour"
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2950",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2953",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2954",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2957",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/5116",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/5118",
 ]
 # List of output folders where compiled results for each recording are stored
+# If any FOLDER in RESULTS_FOLDERS is the same as the corresponding folder in INTERMEDIATE FOLDER, it will be changed to FOLDER/results
 RESULTS_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/dated/220704/2950/results",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2953/results",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2954/results",
-    "/home/maxlim/SpikeSorting/data/dated/220704/2957/results",
-    "/home/maxlim/SpikeSorting/data/dated/220704/5116/results",
-    "/home/maxlim/SpikeSorting/data/dated/220704/5118/results",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706/results"
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour/results"
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2950/results",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2953/results",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2954/results",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/2957/results",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/5116/results",
+    # "/home/maxlim/SpikeSorting/data/dated/220704/5118/results",
 ]
 
 # If COMPILE_RESULTS is True, extracted data from all recordings in RECORDING_FILES will be compiled together
@@ -79,8 +86,8 @@ RECOMPUTE_SORTING = False  # If True, entire intermediate_folder will be deleted
 REEXTRACT_WAVEFORMS = False
 RECURATE_FIRST = False
 RECURATE_SECOND = False
-RECOMPILE_SINGLE_RECORDING = False  # If True, results stored in the RESULTS_FOLDERS are recomputed
-RECOMPILE_ALL_RECORDINGS = True  # If True, results stored in COMPILED_RESULTS_FOLDER are recomputed
+RECOMPILE_SINGLE_RECORDING = True  # If True, results stored in the RESULTS_FOLDERS are recomputed
+RECOMPILE_ALL_RECORDINGS = False  # If True, results stored in COMPILED_RESULTS_FOLDER are recomputed
 
 ######################################################
 ##################  COPY SCRIPT?  ####################
@@ -96,10 +103,17 @@ SAVE_SCRIPT = False
 # Number of jobs to use for converting raw recording and extracting waveforms
 N_JOBS = 64
 # Total RAM to use for converting raw and extracting waveforms
-TOTAL_MEMORY = "8G"
+TOTAL_MEMORY = "16G"
 # IF False, do not use parallel processing for converting the raw recording to the proper format for Kilosort2
 #           The entire recording will be loaded into RAM
-USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION = False
+USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION = True
+
+######################################################
+###############  RECORDING PARAMETERS  ###############
+######################################################
+# Only analyze the first FIRST_N_MINS of recording (i.e. if FIRST_N_MINS = 5, only the first 5 minutes of each recording will be analyzed in this script)
+# If None-> entire recording will be analyzed
+FIRST_N_MINS = None
 
 ######################################################
 ############  BANDPASS FILTER PARAMETERS  ############
@@ -138,7 +152,7 @@ MAX_WAVEFORMS_PER_UNIT = None
 CURATE_FIRST = True
 # If True, units are curated based on min spikes per unit and/or max norm std
 # This curation is used to select only the most consistent waveforms
-CURATE_SECOND = True
+CURATE_SECOND = False
 
 # If both CURATE_FIRST and CURATE_SECOND are True, then first curation precedes second curation
 
@@ -239,8 +253,8 @@ The .npy files in "waveforms" contain the waveforms for each unit (after curatio
 COMPILE_TO_MAT = True
 COMPILE_TO_NPZ = True
 COMPILE_WAVEFORMS = True
-COMPILE_SINGLE_RECORDING = False
-COMPILE_ALL_RECORDINGS = True
+COMPILE_SINGLE_RECORDING = True
+COMPILE_ALL_RECORDINGS = False
 
 # ms before waveform peak to include in saved numpy array
 COMPILED_WAVEFORMS_MS_BEFORE = 0.5
@@ -334,6 +348,8 @@ ALL_TEMPLATES_COLOR_FAILED = "#FF0000"
 ALL_TEMPLATES_PER_COLUMN = 50
 # Spacing between templates (larger values cause lower resolution and vice versa)
 ALL_TEMPLATES_Y_SPACING = 50
+# Buffer for limits of y-axis to add white space at the top and bottom of plots
+ALL_TEMPLATES_Y_LIM_BUFFER = 10
 # ms before waveform peaks to include in plot
 ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK = 5.0
 # ms after waveform peaks to include in plot
@@ -3242,7 +3258,7 @@ class Compiler:
             self.rec_spike_times[rec_name] = np.load(str(curated_first_folder / "spike_times.npy"), mmap_mode="r")
             self.rec_spike_clusters[rec_name] = np.load(str(curated_first_folder / "spike_clusters.npy"), mmap_mode="r")
         else:
-            self.rec_spikes_times[rec_name] = w_e.sorting.spike_times
+            self.rec_spike_times[rec_name] = w_e.sorting.spike_times
             self.rec_spike_clusters[rec_name] = w_e.sorting.spike_clusters
 
         use_pos_peak = w_e.use_pos_peak
@@ -3378,7 +3394,8 @@ class Compiler:
             print("\nSaving figures")
             create_folder(figures_path)
             self.bar_plot.save(figures_path / "curation_bar_plot.png", verbose=True)
-            self.std_scatter.save(figures_path / "std_scatter_plot.png", verbose=True)
+            if self.std_scatter is not None:
+                self.std_scatter.save(figures_path / "std_scatter_plot.png", verbose=True)
             self.templates_plot.save(figures_path / "all_templates_plot.png", verbose=True)
 
     def concatenate_spike_times(self):
@@ -3711,6 +3728,7 @@ class TemplatesPlot(Figure):
         """
         self.n_templates_per_col = ALL_TEMPLATES_PER_COLUMN
         self.y_spacing = ALL_TEMPLATES_Y_SPACING
+        self.y_lim_buffer = ALL_TEMPLATES_Y_LIM_BUFFER
         self.color_curated = ALL_TEMPLATES_COLOR_CURATED
         self.color_failed = ALL_TEMPLATES_COLOR_FAILED
         self.window = [-ALL_TEMPLATES_WINDOW_MS_BEFORE_PEAK, ALL_TEMPLATES_WINDOW_MS_AFTER_PEAK]
@@ -3777,15 +3795,19 @@ class TemplatesPlot(Figure):
             SortedUnit.sort_units(self.units_pos)
 
         # Plot templates
+        neg_y_max = -np.inf
+        neg_y_min = np.inf
+        pos_y_max = -np.inf
+        pos_y_min = np.inf
         subplot_i = 0
         for units in (self.units_neg, self.units_pos):
             y_offset = 0
             count = 0
             for unit in units:  # type: SortedUnit
-                template = unit.template_full[:, unit.chan_max]
+                template = unit.template_full[:, unit.chan_max] - y_offset
                 x_cords = np.arange(template.size) - unit.template_full_peak
                 x_cords = (x_cords / unit.sampling_frequency) * 1000.
-                axs[subplot_i].plot(x_cords, template-y_offset,
+                axs[subplot_i].plot(x_cords, template,
                                     color=self.color_curated if unit.is_curated else self.color_failed)
                 y_offset += self.y_spacing
                 count += 1    
@@ -3793,20 +3815,27 @@ class TemplatesPlot(Figure):
                     subplot_i += 1
                     y_offset = 0
                     count = 0
+
+                if subplot_i < n_col_neg:
+                    neg_y_max = max(neg_y_max, *template)
+                    neg_y_min = min(neg_y_min, *template)
+                else:
+                    pos_y_max = max(pos_y_max, *template)
+                    pos_y_min = min(pos_y_min, *template)
+
             subplot_i = n_col_neg
         
         # Plot vertical lines in each axis and set limits and labels
-        y_lim = None
         for i, ax in enumerate(axs):  # type: int, axes.Axes
             ax.set_xlim(*self.window)
             ax.set_xticks(self.window + [0])
             ax.set_xlabel(self.xlabel)
 
             ax.set_yticks([])
-            if y_lim is None or i == n_col_neg:
-                y_lim = ax.get_ylim()
+            if i < n_col_neg:
+                ax.set_ylim(neg_y_min-self.y_lim_buffer, neg_y_max+self.y_lim_buffer)
             else:
-                ax.set_ylim(*y_lim)
+                ax.set_ylim(pos_y_min-self.y_lim_buffer, pos_y_max+self.y_lim_buffer)
 
             if self.line_before is not None:
                 ax.axvline(-self.line_before, **self.line_kwargs)
@@ -3840,6 +3869,15 @@ def load_raw_recording(rec_path):
             rec = concatenate_recordings(rec_path)
 
         assert rec.get_num_segments() == 1, "Recording has multiple segments. Divide recording into multiple recordings"
+
+        if FIRST_N_MINS is not None:
+            end_frame = FIRST_N_MINS * 60 * rec.get_sampling_frequency()
+            if end_frame > rec.get_num_samples():
+                print(f"'FIRST_N_MINS' is set to {FIRST_N_MINS}, but recording is only {rec.get_total_duration() / 60} min long")
+                print("Using entire duration of recording")
+            else:
+                print(f"Only analyzing the first {FIRST_N_MINS} min of recording")
+                rec = rec.frame_slice(start_frame=0, end_frame=end_frame)
 
         print('Flipping y-coordinates of channel locations ')
         probes_all = []
@@ -3907,6 +3945,9 @@ def get_paths(rec_path, inter_path, results_path):
     curation_first_folder = curation_folder / 'first'
     curation_second_folder = curation_folder / 'second'
     results_path = Path(results_path)
+
+    if results_path == inter_path:
+        results_path /= "results"
 
     delete_folders = []
     if RECOMPUTE_RECORDING:
@@ -4523,7 +4564,7 @@ def compile_results(rec_name, rec_path, results_path, w_e):
     compile_stopwatch = Stopwatch("COMPILING RESULTS")
     print(f"For recording: {rec_path}")
     if COMPILE_SINGLE_RECORDING:
-        if not results_path.exists() or RECOMPILE_SINGLE_RECORDING:
+        if not (results_path / "parameters.json").exists() or RECOMPILE_SINGLE_RECORDING:
             delete_folder(results_path)
             print(f"Saving to path: {results_path}")
             compiler = Compiler()
@@ -4537,6 +4578,7 @@ def compile_results(rec_name, rec_path, results_path, w_e):
 
 
 def main():
+    os.environ['HDF5_PLUGIN_PATH'] = HDF5_PLUGIN_PATH
     compiled_results_folder = Path(COMPILED_RESULTS_FOLDER)
     if COMPILE_ALL_RECORDINGS:
         if not compiled_results_folder.exists() or RECOMPILE_ALL_RECORDINGS:
