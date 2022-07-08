@@ -8,7 +8,11 @@
 # they will be concatenated in natural ordering.
 RECORDING_FILES = [
     # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/data.raw.h5"
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/data.raw.h5"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/data.raw.h5"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/data.raw.h5",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/data.raw.h5",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/data.raw.h5",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/data.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
@@ -20,7 +24,11 @@ RECORDING_FILES = [
 # List of intermediate folders where Kilosort2 sorting results, raw waveforms, and curation data are saved
 INTERMEDIATE_FOLDERS = [
     # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706"
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/sorted/220707/full_hour",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/sorted/220707/full_hour",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/sorted/220707/full_hour",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/sorted/220707/full_hour",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2950",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2953",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2954",
@@ -32,7 +40,11 @@ INTERMEDIATE_FOLDERS = [
 # If any FOLDER in RESULTS_FOLDERS is the same as the corresponding folder in INTERMEDIATE FOLDER, it will be changed to FOLDER/results
 RESULTS_FOLDERS = [
     # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706/results"
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour/results"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour/results"
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/sorted/220707/full_hour/results",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/sorted/220707/full_hour/results",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/sorted/220707/full_hour/results",
+    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/sorted/220707/full_hour/results",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2950/results",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2953/results",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2954/results",

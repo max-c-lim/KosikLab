@@ -72,21 +72,11 @@ max_spikes_per_unit = None
 # Let's do it!
 
 RECORDING_FILES = [
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
-    "/home/maxlim/SpikeSorting/data/DL/recordings/5118.raw.h5",
+    Path("/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5"),
 ]
 
 INTERMEDIATE_FOLDERS = [
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_2950",
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_2953",
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_2954",
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_2957",
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_5116",
-    "/home/maxlim/SpikeSorting/data/dated/220628/al_5118",
+    Path("/home/maxlim/SpikeSorting/data/dated/220707/al_5116"),
 ]
 
 for drug_folder, inter_path in zip(RECORDING_FILES, INTERMEDIATE_FOLDERS):

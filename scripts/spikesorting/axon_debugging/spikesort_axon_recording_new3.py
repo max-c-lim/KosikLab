@@ -8,7 +8,6 @@ import spikeinterface as si
 import spikeinterface.extractors as se
 import spikeinterface.toolkit as st
 import spikeinterface.sorters as ss
-import spikeinterface.widgets as sw
 from spikeinterface.exporters import export_to_phy
 
 import h5py
@@ -22,7 +21,7 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
 import axon_velocity as av
-
+from scipy.io import savemat
 import os
 
 mpl.use("agg")
@@ -68,27 +67,45 @@ def get_wells_and_rec_names(file):
         rec_names = list(f["recordings"])
     return well_names, rec_names
 
+
+def sorting_folder_to_index(sort_folder):
+    if sort_folder.name.startswith("sorting_curated"):
+        prefix = len("sorting_curated_")
+    else:
+        prefix = len("sorting_")
+    return int(sort_folder.name[prefix:])
+
+
+def get_sorting_folders_from_cache(cache_folder):
+    sorting_folders = [p for p in cache_folder.iterdir() if 'sorting_curated_' in p.name and p.is_dir()]
+    if len(sorting_folders) == 0:
+        # auto curate False
+        sorting_folders = [p for p in cache_folder.iterdir() if 'sorting_' in p.name and p.is_dir()]
+    return sorting_folders
+
 ############################################
 ################  INPUTS ###################
 ############################################
 
 # list of axon scan folders you want to spike sort
-axon_scan_folders = ['/home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170']
+axon_scan_folders = ['/home/maxlim/SpikeSorting/data/axon_debugging/test_data']
 
 # list of intermediate folder where tmp and output files are saved
-intermediate_folders = ['/home/morgane/iPS_recordings/211013/211013/11582/Axon_Recording/000170']
+intermediate_folders = ['/home/maxlim/SpikeSorting/data/axon_debugging/220705/test_data_sorted']
 
+# list of output folders where final .mat files are saved
+mat_folders = ['/home/maxlim/SpikeSorting/data/axon_debugging/220705/test_data_sorted/mat']
 
-assert len(axon_scan_folders) == len(intermediate_folders), "'axon_scan_folders' and 'intermediate_folders' " \
-                                                            "should have the same length"
+assert len(axon_scan_folders) == len(intermediate_folders) == len(mat_folders), "'axon_scan_folders' and 'intermediate_folders' and 'mat_folders' " \
+                                                                                "should have the same length"
 
 # sorter name
 sorter = 'kilosort2'
-ss.Kilosort2Sorter.set_kilosort2_path("/home/morgane/Kilosort")
+ss.Kilosort2Sorter.set_kilosort2_path("/home/maxlim/SpikeSorting/Kilosort2")
 print(ss.Kilosort2Sorter.kilosort2_path)
 
 # folder containing libcompression.so
-os.environ['HDF5_PLUGIN_PATH'] = '/home/morgane/so'
+os.environ['HDF5_PLUGIN_PATH'] = '/home/maxlim/SpikeSorting/extra_libraries'
 
 # sorter params
 sorter_params = {"n_jobs_bin": 1, "total_memory": "4G"}
@@ -102,7 +119,8 @@ recompute_sorting = False
 recompute_splitting = False
 recompute_curation = False
 recompute_full_template = False
-recompute_axon_velocities = False
+recompute_axon_velocities = True
+recompute_mat_files = False
 
 # If True, filtered data and sorted outputs are saved in a format that it's easy to retrieve (.pkl)
 dump_recording = True
@@ -154,7 +172,7 @@ params['upsample'] = 2
 params['min_path_length'] = 100
 params['min_path_points'] = 5
 
-for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermediate_folders):
+for (axon_scan_folder, intermediate_folder, mat_folder) in zip(axon_scan_folders, intermediate_folders, mat_folders):
     axon_scan_folder = Path(axon_scan_folder)
     intermediate_folder = Path(intermediate_folder)
     t_start_all = time.time()
@@ -211,6 +229,16 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
             electrode_ids.append(recording.get_property("electrode"))
             channel_ids.append(recording.get_channel_ids())
             recordings.append(recording)
+
+    for i in range(len(recordings)):
+        rec = recordings[i]
+        if rec.has_scaled_traces():
+            gain = rec.get_channel_gains()
+            offset = rec.get_channel_offsets()
+        else:
+            gain = 1
+            offset = 0
+        recordings[i] = st.scale(rec, gain=gain, offset=offset, dtype="float32")
 
     fs = recordings[0].get_sampling_frequency()
     # find common set as intersection
@@ -398,11 +426,12 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
                 units_with_spikes.append(unit)
         multisorting = multisorting.select_units(units_with_spikes)
 
-        units_with_spikes = []
-        for unit in multisorting_curated.get_unit_ids():
-            if len(multisorting_curated.get_unit_spike_train(unit)) > 0:
-                units_with_spikes.append(unit)
-        multisorting_curated = multisorting_curated.select_units(units_with_spikes)
+        if curated:
+            units_with_spikes = []
+            for unit in multisorting_curated.get_unit_ids():
+                if len(multisorting_curated.get_unit_spike_train(unit)) > 0:
+                    units_with_spikes.append(unit)
+            multisorting_curated = multisorting_curated.select_units(units_with_spikes)
 
         # get single sortings and remove empty clusters
         sortings = []
@@ -418,6 +447,9 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
             for unit in sorting.get_unit_ids():
                 if len(sorting.get_unit_spike_train(unit)) > 0:
                     units_with_spikes.append(unit)
+            if len(units_with_spikes) == 0:
+                print(f"Skipping sorting {i} because no spikes detected")
+                continue
             sorting = sorting.select_units(units_with_spikes)
             if (cache_folder / f'sorting_{i}').is_dir():
                 shutil.rmtree(cache_folder / f'sorting_{i}')
@@ -430,6 +462,9 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
                 for unit in sorting_curated.get_unit_ids():
                     if len(sorting_curated.get_unit_spike_train(unit)) > 0:
                         units_with_spikes.append(unit)
+                if len(units_with_spikes) == 0:
+                    print(f"Skipping curated sorting {i} because no spikes detected")
+                    continue
                 sorting_curated = sorting_curated.select_units(units_with_spikes)
                 if (cache_folder / f'sorting_curated_{i}').is_dir():
                     shutil.rmtree(cache_folder / f'sorting_curated_{i}')
@@ -469,18 +504,16 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
     else:
         print("Extracting full templates")
         t_start = time.time()
-        sorting_folders = [p for p in cache_folder.iterdir() if 'sorting_curated_' in p.name and p.is_dir()]
-        if len(sorting_folders) == 0:
-            # auto curate False
-            sorting_folders = [p for p in cache_folder.iterdir() if 'sorting_' in p.name and p.is_dir()]
+        sorting_folders = get_sorting_folders_from_cache(cache_folder)
         sort_ids = [int(sort.stem.split('_')[-1]) for sort in sorting_folders]
         sorting_folders = np.array(sorting_folders)[np.argsort(sort_ids)]
 
-        sortings = []
+        sortings = [None] * len(recordings)
         units = []
         for i, sort_folder in enumerate(sorting_folders):
+            i = sorting_folder_to_index(sort_folder)
             sort = si.load_extractor(sort_folder)
-            sortings.append(sort)
+            sortings[i] = sort
 
         if (cache_folder / 'sorting_curated').is_dir():
             sorting = si.load_extractor(cache_folder / 'sorting_curated')
@@ -499,10 +532,14 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
             template_dict[u] = {'templates': [],
                                 'locations': []}
 
+        template_shape = None
         for i in np.arange(len(rec_filtered)):
             sorting_tmp_folder = cache_folder / f'sorting_templates_{i}'
             recf = rec_filtered[i]
             sort = sortings[i]
+            if sort is None:
+                print(f"Skipping sorting for recording {i+1} because no units detected")
+                continue
 
             if sorting_tmp_folder.is_dir():
                 print("Loading cached sortings with templates")
@@ -518,7 +555,7 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
                 sort.set_property("template", temps)
                 sort.save(folder=sorting_tmp_folder)
 
-            if i == 0:
+            if template_shape is None:  # if i == 0:
                 template_shape = temps[0].shape
             for (u, temp) in zip(sort.get_unit_ids(), temps):
                 template_dict[u]['templates'].append(temp.T)
@@ -596,7 +633,7 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
         sorting_axon = si.load_extractor(cache_folder / "sorting_axons")
     else:
         print("Axon tracking params")
-        pprint(params)
+        print(params)
 
         unit_ids = sorting.get_unit_ids()
         templates = full_templates
@@ -616,33 +653,61 @@ for (axon_scan_folder, intermediate_folder) in zip(axon_scan_folders, intermedia
                 print(f"Axon tracking failed unit {u}: \nError {e}")
 
         print(f"Found {len(units_with_axon)} with a detectable axons!")
+        if len(units_with_axon) > 0:
+            sorting_axon = sorting.select_units(units_with_axon)
+            sorting_axon.set_property("gtr", gtrs)
 
-        sorting_axon = sorting.select_units(units_with_axon)
-        sorting_axon.set_property("gtr", gtrs)
-
-        if dump_sorting and len(units_with_axon) > 0:
-            sorting_axon.save(folder=cache_folder / "sorting_axons")
+            if dump_sorting and len(units_with_axon) > 0:
+                sorting_axon.save(folder=cache_folder / "sorting_axons")
+        else:
+            sorting_axon = None
     t_stop_axons = time.time()
     print(f"\n\nTotal axon extraction time {np.round(t_stop_axons - t_start_axons, 2)} s")
 
-    t_start_axon_plot = time.time()
-    if plot_unit_axons:
-        figures_axons = figures_folder / "units_axons"
-        figures_axons.mkdir(parents=True, exist_ok=True)
+    if sorting_axon is not None:
+        t_start_axon_plot = time.time()
+        if plot_unit_axons:
+            figures_axons = figures_folder / "units_axons"
+            figures_axons.mkdir(parents=True, exist_ok=True)
 
-        gtrs = sorting_axon.get_property("gtr")
-        unit_ids = sorting_axon.get_unit_ids()
-        for i_u in tqdm(np.arange(len(unit_ids)), ascii=True,
-                        desc=f"Plotting unit axons"):
-            u = unit_ids[i_u]
-            gtr = gtrs[i_u]
+            gtrs = sorting_axon.get_property("gtr")
+            unit_ids = sorting_axon.get_unit_ids()
+            for i_u in tqdm(np.arange(len(unit_ids)), ascii=True,
+                            desc=f"Plotting unit axons"):
+                u = unit_ids[i_u]
+                gtr = gtrs[i_u]
 
-            fig_name = f"unit{u}.pdf"
-            fig = plt.figure(figsize=(10, 6))
-            amp = np.round(np.max(np.abs(gtr.amplitudes)), 2)
-            fig, axes = av.plot_axon_summary(gtr, fig=fig)
-            fig.suptitle(f"unit {u} - amp {amp}$\mu$V\n")
-            fig.savefig(str(figures_axons / fig_name))
-            plt.close(fig)
-    t_stop_axon_plot = time.time()
-    print(f"\n\nTotal axon plotting time {np.round(t_stop_axon_plot - t_start_axon_plot, 2)} s")
+                fig_name = f"unit{u}.pdf"
+                fig = plt.figure(figsize=(10, 6))
+                amp = np.round(np.max(np.abs(gtr.amplitudes)), 2)
+                fig, axes = av.plot_axon_summary(gtr, fig=fig)
+                fig.suptitle(f"unit {u} - amp {amp}$\mu$V\n")
+                fig.savefig(str(figures_axons / fig_name))
+                plt.close(fig)
+        t_stop_axon_plot = time.time()
+        print(f"\n\nTotal axon plotting time {np.round(t_stop_axon_plot - t_start_axon_plot, 2)} s")
+    else:
+        print("\n\nSkipping plotting axons because no detectable axons\n\n")
+
+    mat_folder_path = Path(mat_folder)
+    mat_folder_path.mkdir(exist_ok=True, parents=True)
+    mat_files = [file for file in mat_folder_path.iterdir() if file.is_file() and file.suffix == ".mat"]
+    sorting_folders = get_sorting_folders_from_cache(cache_folder)
+    if len(mat_files) == len(sorting_folders) and not recompute_mat_files:
+        print("Skipping computing .mat files because already computed")
+    else:
+        print(f"Computing .mat files for {len(sorting_folders)} recordings/sortings")
+        # for sorting_folder in sorting_folders:
+        #     sorting = si.load_extractor(sorting_folder)
+        #     i = sorting_folder_to_index(sorting_folder)
+        #     recording = recordings[i]
+        #     mdict = {"units": [], "locations": recording.get_channel_locations(), "fs": recording.get_sampling_frequency()}
+        #
+        #     # Get max channels
+        #     max_channels = si.get_template_extremum_channel(waveform_extractor)
+        #     from spikeinterface.core import WaveformExtractor
+        #     # Get channel locations
+        #     locations = recording.get_channel_locations()
+        #
+        #     # Get electrodes
+        #     electrodes = recording.get_property('electrode')
