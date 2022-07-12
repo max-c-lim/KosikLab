@@ -7,14 +7,20 @@
 # If path is a folder with multiple recording files,
 # they will be concatenated in natural ordering.
 RECORDING_FILES = [
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/data.raw.h5"
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/data.raw.h5"
+    # Done
     # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/data.raw.h5",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/data.raw.h5",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/data.raw.h5",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/data.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/data.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/data.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16460/Network/000439/data.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/data.raw.h5",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/data.raw.h5",
+
+    # Not Done
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/data.raw.h5",
+
+    # Deep learning recordings
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2950.raw.h5",
-    # "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
+    "/home/maxlim/SpikeSorting/data/DL/recordings/2953.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2954.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/2957.raw.h5",
     # "/home/maxlim/SpikeSorting/data/DL/recordings/5116.raw.h5",
@@ -23,35 +29,27 @@ RECORDING_FILES = [
 ]
 # List of intermediate folders where Kilosort2 sorting results, raw waveforms, and curation data are saved
 INTERMEDIATE_FOLDERS = [
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706"
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour"
     # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/sorted/220707/full_hour",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/sorted/220707/full_hour",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/sorted/220707/full_hour",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/sorted/220707/full_hour",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/sorted/220707/full_hour",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16460/Network/000439/sorted/220706_full_hour",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706",
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/sorted/220711/full_hour",
+
+    # Not done
+    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/sorted/220711/full_hour",
+
+    # Deep learning recordings
     # "/home/maxlim/SpikeSorting/data/dated/220704/2950",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/2953",
+    "/home/maxlim/SpikeSorting/data/DL/sorted/2953/220712",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2954",
     # "/home/maxlim/SpikeSorting/data/dated/220704/2957",
     # "/home/maxlim/SpikeSorting/data/dated/220704/5116",
     # "/home/maxlim/SpikeSorting/data/dated/220704/5118",
 ]
 # List of output folders where compiled results for each recording are stored
-# If any FOLDER in RESULTS_FOLDERS is the same as the corresponding folder in INTERMEDIATE FOLDER, it will be changed to FOLDER/results
-RESULTS_FOLDERS = [
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16464/Network/000437/sorted/220706/results"
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220705/16397/Network/000447/sorted/220706_full_hour/results"
-    # "/home/maxlim/kosik_server/data/MEAprojects/organoid/220318/14086/Network/000359/sorted/220707/full_hour/results",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220505/14206/Network/000411/sorted/220707/full_hour/results",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220510/14206/Network/000425/sorted/220707/full_hour/results",
-    "/home/maxlim/kosik_server/data/MEAprojects/organoid/220628/16464/Network/000435/sorted/220707/full_hour/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/2950/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/2953/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/2954/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/2957/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/5116/results",
-    # "/home/maxlim/SpikeSorting/data/dated/220704/5118/results",
-]
+# If a FOLDER in RESULTS_FOLDERS is the same as its corresponding folder in INTERMEDIATE_FOLDERS, it will be changed to FOLDER/results
+RESULTS_FOLDERS = INTERMEDIATE_FOLDERS[:]  # ["/home/maxlim/SpikeSorting/data/DL/sorted/2953/220711",]
 
 # If COMPILE_RESULTS is True, extracted data from all recordings in RECORDING_FILES will be compiled together
 COMPILED_RESULTS_FOLDER = "/home/maxlim/SpikeSorting/data/dated/220704/6_compiled"
@@ -115,7 +113,7 @@ SAVE_SCRIPT = False
 # Number of jobs to use for converting raw recording and extracting waveforms
 N_JOBS = 64
 # Total RAM to use for converting raw and extracting waveforms
-TOTAL_MEMORY = "16G"
+TOTAL_MEMORY = "8G"
 # IF False, do not use parallel processing for converting the raw recording to the proper format for Kilosort2
 #           The entire recording will be loaded into RAM
 USE_PARALLEL_PROCESSING_FOR_RAW_CONVERSION = True
@@ -264,14 +262,14 @@ The .npy files in "waveforms" contain the waveforms for each unit (after curatio
 """
 COMPILE_TO_MAT = True
 COMPILE_TO_NPZ = True
-COMPILE_WAVEFORMS = True
+COMPILE_WAVEFORMS = False
 COMPILE_SINGLE_RECORDING = True
 COMPILE_ALL_RECORDINGS = False
 
 # ms before waveform peak to include in saved numpy array
-COMPILED_WAVEFORMS_MS_BEFORE = 0.5
+COMPILED_WAVEFORMS_MS_BEFORE = 3
 # ms after waveform peak to include in saved numpy array
-COMPILED_WAVEFORMS_MS_AFTER = 1.5
+COMPILED_WAVEFORMS_MS_AFTER = 4
 
 ######################################################
 ################  FIGURE PARAMETERS  #################
@@ -298,7 +296,7 @@ They will be stored in in COMPILED_RESULTS_FOLDER/figures
 
 NOTE: All waveforms must have been extracted with the same parameters
 """
-CREATE_FIGURES = True
+CREATE_FIGURES = False
 
 # Figures' DPI (None-> default value is used)
 FIGURES_DPI = 200
@@ -789,7 +787,7 @@ end'''
         if has_error and raise_error:
             # print(runtime_trace)
             raise Exception(
-                f"Spike sorting failed. You can inspect the runtime trace in {output_folder}/kilosort2.log")
+                f"You can inspect the runtime trace in {output_folder}/kilosort2.log")
 
         return run_time
 
@@ -1024,6 +1022,7 @@ class KilosortSortingExtractor:
 
     def ms_to_samples(self, ms):
         return int(ms * self.sampling_frequency / 1000.)
+
 
 class ShellScript:
     """
@@ -1507,9 +1506,12 @@ class WaveformExtractor:
                 # protect from spikes on border :  spike_time<0 or spike_time>seg_size
                 # useful only when max_spikes_per_unit is not None
                 # waveform will not be extracted and a zeros will be left in the memmap file
-                while (spike_times[i0] - nbefore) < 0 and (i0 != i1):
+                template_half_window_size = templates_half_windows_sizes[unit_id]
+                before_buffer = max(nbefore, template_half_window_size)
+                after_buffer = max(nafter, template_half_window_size)
+                while (spike_times[i0] - before_buffer) < 0 and (i0 != i1):
                     i0 = i0 + 1
-                while (spike_times[i1 - 1] + nafter) > seg_size and (i0 != i1):
+                while (spike_times[i1 - 1] + after_buffer) > seg_size and (i0 != i1):
                     i1 = i1 - 1
 
             if i0 != i1:
@@ -1522,7 +1524,6 @@ class WaveformExtractor:
             end = max(st[-1] + nbefore + templates_half_windows_sizes[uid] for uid, (_, _, st) in to_extract.items())
             start = int(start)
             end = int(end)
-
             # load trace in memory
             traces = recording.get_traces(start_frame=start, end_frame=end, segment_index=segment_index,
                                           return_scaled=return_scaled)
@@ -1763,6 +1764,7 @@ class WaveformExtractor:
                 return json.load(f)
         else:
             return None
+
     # endregion
 
     # region Format files
@@ -3204,6 +3206,7 @@ class Compiler:
     """
     Class to compile together results from different recordings
     """
+
     def __init__(self):
         self.create_figures = CREATE_FIGURES
         self.create_std_scatter_plot = CURATE_SECOND and SPIKES_MIN_SECOND is not None and STD_NORM_MAX is not None
@@ -3363,6 +3366,7 @@ class Compiler:
                             "max_channel_si": unit.chan_max,  # Max channel index (used for getting max waveforms and template)
                             "max_channel_id": unit.chan_max_id,  # Max channel ID (used for getting channel from braingeneers ephys data loader)
                             "peak_sign": "positive" if half.has_pos_peak else "negative",
+                            "peak_ind": unit.peak_ind,
                         }
                         if self.save_electrodes:
                             unit_dict["electrode"] = unit.electrode
@@ -3422,7 +3426,7 @@ class Compiler:
         concatenated_spike_times = np.array([])
         increment = 0
         for rec in self.rec_names:
-            concatenated_spike_times = np.concatenate((concatenated_spike_times, self.rec_spike_times[rec]+increment))
+            concatenated_spike_times = np.concatenate((concatenated_spike_times, self.rec_spike_times[rec] + increment))
             increment += self.rec_n_samples[rec]
         return concatenated_spike_times
 
@@ -3444,6 +3448,7 @@ class HalfCompiler:
     Functions with class Compiler
     I.e. One HalfCompiler for negative peak data and another for positive peak data
     """
+
     def __init__(self, has_pos_peak):
         """
 
@@ -3473,6 +3478,7 @@ class SortedUnit:
     Functions with class HalfCompiler to represent the units that
     HalfCompiler will compile together
     """
+
     def __init__(self, unit_id, rec_name, w_e, is_curated):
         """
         Parameters
@@ -3502,11 +3508,11 @@ class SortedUnit:
         self.template_full = template
         self.template_full_peak = w_e.peak_ind
 
-        self.template = template[w_e.peak_ind-self.nbefore:w_e.peak_ind+self.nafter, :]
+        self.template = template[w_e.peak_ind - self.nbefore:w_e.peak_ind + self.nafter, :]
         self.amplitude = np.abs(self.template[self.peak_ind, self.chan_max])
 
         waveforms = w_e.get_waveforms(unit_id=unit_id)
-        self.waveforms = waveforms[:, w_e.peak_ind-self.nbefore:w_e.peak_ind+self.nafter, :]
+        self.waveforms = waveforms[:, w_e.peak_ind - self.nbefore:w_e.peak_ind + self.nafter, :]
 
         self.sorted_index = None
         self.spike_train = None
@@ -3822,7 +3828,7 @@ class TemplatesPlot(Figure):
                 axs[subplot_i].plot(x_cords, template,
                                     color=self.color_curated if unit.is_curated else self.color_failed)
                 y_offset += self.y_spacing
-                count += 1    
+                count += 1
                 if count == self.n_templates_per_col:
                     subplot_i += 1
                     y_offset = 0
@@ -3836,7 +3842,7 @@ class TemplatesPlot(Figure):
                     pos_y_min = min(pos_y_min, *template)
 
             subplot_i = n_col_neg
-        
+
         # Plot vertical lines in each axis and set limits and labels
         for i, ax in enumerate(axs):  # type: int, axes.Axes
             ax.set_xlim(*self.window)
@@ -3845,9 +3851,9 @@ class TemplatesPlot(Figure):
 
             ax.set_yticks([])
             if i < n_col_neg:
-                ax.set_ylim(neg_y_min-self.y_lim_buffer, neg_y_max+self.y_lim_buffer)
+                ax.set_ylim(neg_y_min - self.y_lim_buffer, neg_y_max + self.y_lim_buffer)
             else:
-                ax.set_ylim(pos_y_min-self.y_lim_buffer, pos_y_max+self.y_lim_buffer)
+                ax.set_ylim(pos_y_min - self.y_lim_buffer, pos_y_max + self.y_lim_buffer)
 
             if self.line_before is not None:
                 ax.axvline(-self.line_before, **self.line_kwargs)
@@ -3895,7 +3901,7 @@ def load_raw_recording(rec_path):
         probes_all = []
         for probe in rec.get_probes():
             y_cords = probe._contact_positions[:, 1]
-            y_cords_flipped = max(y_cords) - y_cords
+            y_cords_flipped = max(y_cords) - y_cords + min(y_cords)
             probe._contact_positions[np.arange(y_cords_flipped.size), 1] = y_cords_flipped
             probes_all.append(probe)
         rec = rec.set_probes(probes_all)
@@ -4031,7 +4037,9 @@ def spike_sort(rec_cache, rec_path, recording_dat_path, output_folder):
                                    output_folder=output_folder)
 
     except Exception as e:
-        print(f"Kilosort2 failed on recording {rec_path} because of {e}")
+        print(f"Kilosort2 failed on recording {rec_path}\n{e}")
+        print("Moving on to next recording")
+        return -1
 
     stopwatch.log_time("Done sorting.")
     print(f"Kilosort detected {len(sorting.unit_ids)} units")
@@ -4261,7 +4269,8 @@ def curate_second(we_raw, curation_history, waveforms_root_folder, curation_seco
 
 def process_recording(rec_name, rec_path, inter_path, results_path):
     # Get Paths
-    rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_initial_folder, curation_first_folder, curation_second_folder, results_path = get_paths(rec_path, inter_path, results_path)
+    rec_path, inter_path, recording_saved_path, recording_dat_path, output_folder, waveforms_root_folder, curation_initial_folder, curation_first_folder, curation_second_folder, results_path = get_paths(
+        rec_path, inter_path, results_path)
 
     # Save a copy of the script
     if SAVE_SCRIPT:
@@ -4298,81 +4307,6 @@ def process_recording(rec_name, rec_path, inter_path, results_path):
     return w_e_curated
 
 
-def export_results(waveform_extractor, rec_name, results_path):
-    print_stage("EXPORTING RESULTS TO .mat AND .npz")
-    stopwatch = Stopwatch()
-
-    # Get .mat file path
-    name_mat = rec_name + "_sorted.mat"
-    mat_file = Path(results_path) / name_mat
-
-    # Get .npz file path
-    name_npz = rec_name + "_sorted.npz"
-    npz_file = Path(results_path) / name_npz
-
-    skip = 0
-    if mat_file.exists():
-        if True:  # REEXPORT_MAT
-            mat_file.unlink()
-            print(f"Deleted {mat_file}")
-        else:
-            print(f"Skipping creating {mat_file} since already created")
-            skip += 1
-
-    if npz_file.exists():
-        if True:  # REEXPORT_NPZ
-            npz_file.unlink()
-            print(f"Deleted {npz_file}")
-        else:
-            print(f"Skipping creating {npz_file} since already created")
-            skip += 1
-
-    if skip == 2:
-        return
-
-    # Make parent file
-    create_folder(mat_file.parent)
-
-    recording = waveform_extractor.recording
-    sorting = waveform_extractor.sorting
-
-    mdict = {"units": [], "locations": recording.get_channel_locations(), "fs": recording.get_sampling_frequency()}
-
-    # Get channel locations
-    locations = recording.get_channel_locations()
-
-    # Get electrodes
-    if SAVE_ELECTRODES:
-        electrodes = recording.get_property('electrode')
-
-    for u in sorting.unit_ids:
-        chan_max_ind = waveform_extractor.chans_max_all[u]
-        location_max = locations[chan_max_ind]
-
-        unit_dict = {
-            "unit_id": u,
-            "spike_train": sorting.get_unit_spike_train(u),
-            "x_max": location_max[0],
-            "y_max": location_max[1],
-            "template": waveform_extractor.get_computed_template(u, mode="average"),
-        }
-
-        if SAVE_ELECTRODES:
-            electrode = electrodes[chan_max_ind]
-            unit_dict["electrode"] = electrode
-
-        mdict["units"].append(unit_dict)
-
-    if not mat_file.exists():
-        savemat(mat_file, mdict)
-        print(f"Results saved to {mat_file}")
-    if not npz_file.exists():
-        np.savez(npz_file, units=mdict["units"], locations=mdict["locations"], fs=mdict["fs"])
-        print(f"Resulst saved to {npz_file}")
-
-    stopwatch.log_time()
-
-
 def copy_script(path):
     # Copies script and stores it in path
     # https://stackoverflow.com/questions/23321100/best-way-to-have-a-python-script-copy-itself/49210778
@@ -4380,196 +4314,6 @@ def copy_script(path):
     copied_path = (path / copied_script_name).absolute()
     shutil.copyfile(__file__, copied_path)
     print(f"Saved a copy of script to {copied_path}")
-
-
-def old_compile_results(compiled_rec_paths, compiled_rec_names, compiled_waveform_extractors):
-    compile_stopwatch = Stopwatch("COMPILING RESULTS")
-    compiled_folder = Path(COMPILED_RESULTS_FOLDER)
-
-    if len(compiled_rec_names) == 0:
-        print("Skipping creating figures because no recording was analyzed without errors")
-        return
-
-    # if compiled_folder.exists():
-    #     if RECOMPILE_RESULTS:
-    #         shutil.rmtree(compiled_folder)
-    #     else:
-    #         print("Skipping compiling results because already compiled")
-    #         return
-
-    # if not COMPILE_RESULTS:
-    #     print(f"Skipping compiling results since 'COMPILE_RESULTS' is set to False")
-    #     return
-
-    compiled_folder = Path(COMPILED_RESULTS_FOLDER)
-    create_folder(compiled_folder)
-    print(f"Compiling results from the following recordings: {', '.join(compiled_rec_names)}")
-
-    # Save waveforms:
-    stopwatch = Stopwatch("COMPILING WAVEFORMS")
-    neg_templates = []
-    neg_amplitudes = []
-    neg_chans_max = []
-    neg_file_paths = []
-    neg_wfs_windows = []
-    neg_old_ids = []
-    neg_old_id_to_new = dict()
-    neg_recs = []
-
-    pos_templates = []
-    pos_amplitudes = []
-    pos_chans_max = []
-    pos_file_paths = []
-    pos_wfs_windows = []
-    pos_old_ids = []
-    pos_old_id_to_new = dict()
-    pos_recs = []
-
-    for rec, w_e in zip(compiled_rec_names, compiled_waveform_extractors):
-        unit_ids_curated = w_e.sorting.unit_ids
-
-        file_paths_all = np.asarray([w_e.root_folder / "waveforms" / f"waveforms_{u}.npy" for u in unit_ids_curated])
-        chans_max_all = w_e.chans_max_all[unit_ids_curated]
-        use_pos_peak = w_e.use_pos_peak[unit_ids_curated]
-
-        templates = w_e.get_computed_template(unit_ids_curated, mode="average")
-        amplitudes = np.abs(templates[np.arange(len(unit_ids_curated)), w_e.peak_ind, chans_max_all])
-
-        indices_neg_peak = np.flatnonzero(use_pos_peak == 0)
-        indices_pos_peak = np.flatnonzero(use_pos_peak)
-
-        neg_templates.append(templates)
-        neg_amplitudes.append(amplitudes[indices_neg_peak])
-        neg_chans_max.append(chans_max_all[indices_neg_peak])
-        neg_file_paths.append(file_paths_all[indices_neg_peak])
-
-        pos_templates.append(templates)
-        pos_amplitudes.append(amplitudes[indices_pos_peak])
-        pos_chans_max.append(chans_max_all[indices_pos_peak])
-        pos_file_paths.append(file_paths_all[indices_pos_peak])
-
-        nbefore = w_e.ms_to_samples(COMPILED_WAVEFORMS_MS_BEFORE)
-        nafter = w_e.ms_to_samples(COMPILED_WAVEFORMS_MS_AFTER) + 1
-        peak_ind = w_e.peak_ind
-        neg_wfs_windows.extend([(nbefore, nafter, peak_ind)] * indices_neg_peak.size)
-        pos_wfs_windows.extend([(nbefore, nafter, peak_ind)] * indices_pos_peak.size)
-
-        neg_old_ids.extend(np.array(unit_ids_curated)[indices_neg_peak])
-        pos_old_ids.extend(np.array(unit_ids_curated)[indices_pos_peak])
-
-        neg_recs.extend([rec] * indices_neg_peak.size)
-        pos_recs.extend([rec] * indices_pos_peak.size)
-
-    neg_peaks_folder = compiled_folder / "waveforms" / "negative_peaks"
-    pos_peaks_folder = compiled_folder / "waveforms" / "positive_peaks"
-    for folder, amplitudes, chans_max, file_paths, windows, templates, old_ids, old_id_to_new, recs in zip((neg_peaks_folder, pos_peaks_folder),
-                                                                                                           (neg_amplitudes, pos_amplitudes),
-                                                                                                           (neg_chans_max, pos_chans_max),
-                                                                                                           (neg_file_paths, pos_file_paths),
-                                                                                                           (neg_wfs_windows, pos_wfs_windows),
-                                                                                                           (neg_templates, pos_templates),
-                                                                                                           (neg_old_ids, pos_old_ids),
-                                                                                                           (neg_old_id_to_new, pos_old_id_to_new),
-                                                                                                           (neg_recs, pos_recs)):
-        create_folder(folder)
-        create_folder(folder / "waveforms")
-        indices_sorted = np.argsort(-np.concatenate(amplitudes))
-
-        templates = np.concatenate(templates, axis=0)[indices_sorted]
-        np.save(str(folder / "templates.npy"), templates)
-
-        chans_max = np.concatenate(chans_max)[indices_sorted]
-        np.save(str(folder / "chans_max.npy"), chans_max)
-
-        file_paths = np.concatenate(file_paths)[indices_sorted]
-        windows = np.array(neg_wfs_windows)[indices_sorted]
-        for wf_id, (path, window, rec, old_id) in enumerate(zip(file_paths, windows, np.array(recs)[indices_sorted], np.array(old_ids)[indices_sorted])):
-            nbefore, nafter, peak_ind = window
-            wfs = np.load(str(path), mmap_mode="r")[peak_ind - nbefore: peak_ind + nafter]
-            np.save(str(folder / "waveforms" / f"waveforms_{wf_id}.npy"), wfs)
-            old_id_to_new[(rec, old_id)] = wf_id
-    stopwatch.log_time("\nDone compiling waveforms.")
-
-    print("Saving .npz files")
-
-    npz_neg = {"units": [], "locations": dict(), "fs": dict()}
-    npz_pos = {"units": [], "locations": dict(), "fs": dict()}
-    for rec_name, w_e in zip(compiled_rec_names, compiled_waveform_extractors):
-        locations = w_e.recording.get_channel_locations()
-
-        npz_neg["locations"][rec_name] = locations
-        npz_neg["fs"][rec_name] = w_e.recording.get_sampling_frequency()
-
-        npz_pos["locations"][rec_name] = locations
-        npz_pos["fs"][rec_name] = w_e.recording.get_sampling_frequency()
-
-        # Get electrodes
-        if SAVE_ELECTRODES:
-            electrodes = w_e.recording.get_property('electrode')
-
-        for old_u in w_e.sorting.unit_ids:
-            if (rec_name, old_u) in neg_old_id_to_new:
-                u = neg_old_id_to_new[(rec_name, old_u)]
-                npz = npz_neg
-            else:
-                u = pos_old_id_to_new[(rec_name, old_u)]
-                npz = npz_pos
-
-            chan_max_ind = w_e.chans_max_all[old_u]
-            location_max = locations[chan_max_ind]
-
-            unit_dict = {
-                "unit_id": u,
-                "spike_train": w_e.sorting.get_unit_spike_train(old_u),
-                "x_max": location_max[0],
-                "y_max": location_max[1],
-                "template": w_e.get_computed_template(old_u, mode="average"),
-            }
-
-            if SAVE_ELECTRODES:
-                electrode = electrodes[chan_max_ind]
-                unit_dict["electrode"] = electrode
-
-            npz["units"].append(unit_dict)
-
-    sorted_npz_folder = compiled_folder / "sorted_npz"
-    create_folder(sorted_npz_folder)
-    np.savez(sorted_npz_folder / "units_positive_peaks.npz", npz_pos)
-    np.savez(sorted_npz_folder / "units_negative_peaks.npz", npz_neg)
-
-    stopwatch = Stopwatch("SAVING SPIKE TIMES")
-    spike_times_folder = compiled_folder / "spike_times"
-    create_folder(spike_times_folder)
-    for rec, w_e in zip(compiled_rec_names, compiled_waveform_extractors):
-        spike_times = w_e.sorting.spike_times
-        spike_clusters = w_e.sorting.spike_clusters
-        if (w_e.root_folder / "curation_first").exists():
-            unit_ids_all = WaveformExtractor.load_from_folder(w_e.recording, w_e.sorting, w_e.root_folder, w_e.root_folder / "curation_first").sorting.unit_ids
-        else:
-            unit_ids_all = w_e.sorting.unit_ids_all
-        curated_indices = [i for i, c in enumerate(spike_clusters) if c in set(unit_ids_all)]
-        spike_times_curated = spike_times[curated_indices].tolist()
-
-        np.savetxt(spike_times_folder / f"spike_times_{rec}.csv", spike_times_curated, delimiter=",")
-    stopwatch.log_time("Done saving spike times.")
-
-    print("Saving sorting and curation parameters to JSON file")
-    parameters = KILOSORT_PARAMS
-    parameters["recording_files"] = {name: path for name, path in zip(compiled_rec_names, compiled_rec_paths)}
-    parameters["n_jobs"] = N_JOBS
-    parameters["total_memory"] = TOTAL_MEMORY
-    parameters["use_parallel_processing_for_raw_conversion"] = True
-    parameters["freq_min"] = FREQ_MIN
-    parameters["freq_max"] = FREQ_MAX
-    parameters["waveforms_ms_before"] = WAVEFORMS_MS_BEFORE
-    for var in ["WAVEFORMS_MS_AFTER", "POS_PEAK_THRESH", "MAX_WAVEFORMS_PER_UNIT", "CURATE_FIRST", "CURATE_SECOND",
-                "FR_MIN", "ISI_VIOL_MAX", "SNR_MIN", "SPIKES_MIN_FIRST", "SPIKES_MIN_SECOND", "STD_NORM_MAX",
-                "STD_AT_PEAK", "STD_OVER_WINDOW_MS_BEFORE", "STD_OVER_WINDOW_MS_AFTER", "COMPILED_WAVEFORMS_MS_BEFORE", "COMPILED_WAVEFORMS_MS_AFTER"]:
-        parameters[var.lower()] = globals()[var]
-    with open(compiled_folder / "parameters.json", "w") as f:
-        json.dump(parameters, f)
-
-    compile_stopwatch.log_time("\nDone compiling results. Total")
 
 
 def compile_results(rec_name, rec_path, results_path, w_e):
