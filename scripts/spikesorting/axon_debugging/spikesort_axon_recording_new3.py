@@ -23,6 +23,7 @@ from joblib import Parallel, delayed
 import axon_velocity as av
 from scipy.io import savemat
 import os
+from tqdm import tqdm
 
 mpl.use("agg")
 
@@ -119,7 +120,7 @@ recompute_sorting = False
 recompute_splitting = False
 recompute_curation = False
 recompute_full_template = False
-recompute_axon_velocities = True
+recompute_axon_velocities = False
 recompute_mat_files = False
 
 # If True, filtered data and sorted outputs are saved in a format that it's easy to retrieve (.pkl)
@@ -579,8 +580,10 @@ for (axon_scan_folder, intermediate_folder, mat_folder) in zip(axon_scan_folders
         sorting.set_property("template", full_templates)
 
         sorting.save(folder=cache_folder / 'sorting_full_templates')
-        np.save("full_locations.npy", locations_all)
-        np.save("full_templates.npy", full_templates)
+        print("Saving locations in npy")
+        np.save(cache_folder / "full_locations.npy", locations_all)
+        print("Saving templates in npy")
+        np.save(cache_folder / "full_templates.npy", full_templates)
         t_stop = time.time()
         print(f"Elapsed time full template extraction: {t_stop - t_start}s")
 
@@ -596,8 +599,8 @@ for (axon_scan_folder, intermediate_folder, mat_folder) in zip(axon_scan_folders
 
     print(f"Total units {len(sorting.get_unit_ids())}")
 
-    t_start_plot = time.time()
     if plot_unit_templates:
+        t_start_plot = time.time()
         figures_units = figures_folder / "units"
         figures_units.mkdir(parents=True, exist_ok=True)
 
@@ -623,8 +626,8 @@ for (axon_scan_folder, intermediate_folder, mat_folder) in zip(axon_scan_folders
             fig.savefig(str(figures_units / fig_name))
             plt.close(fig)
 
-    t_stop_plot = time.time()
-    print(f"\n\nTotal plotting time {np.round(t_stop_plot - t_start_plot, 2)} s")
+        t_stop_plot = time.time()
+        print(f"\n\nTotal plotting time {np.round(t_stop_plot - t_start_plot, 2)} s")
 
     # Compute axon velocities
     t_start_axons = time.time()
@@ -692,22 +695,45 @@ for (axon_scan_folder, intermediate_folder, mat_folder) in zip(axon_scan_folders
     mat_folder_path = Path(mat_folder)
     mat_folder_path.mkdir(exist_ok=True, parents=True)
     mat_files = [file for file in mat_folder_path.iterdir() if file.is_file() and file.suffix == ".mat"]
-    sorting_folders = get_sorting_folders_from_cache(cache_folder)
-    if len(mat_files) == len(sorting_folders) and not recompute_mat_files:
+    if len(mat_files) == len(recordings) and not recompute_mat_files:
         print("Skipping computing .mat files because already computed")
     else:
-        print(f"Computing .mat files for {len(sorting_folders)} recordings/sortings")
-        # for sorting_folder in sorting_folders:
-        #     sorting = si.load_extractor(sorting_folder)
-        #     i = sorting_folder_to_index(sorting_folder)
-        #     recording = recordings[i]
-        #     mdict = {"units": [], "locations": recording.get_channel_locations(), "fs": recording.get_sampling_frequency()}
-        #
-        #     # Get max channels
-        #     max_channels = si.get_template_extremum_channel(waveform_extractor)
-        #     from spikeinterface.core import WaveformExtractor
-        #     # Get channel locations
-        #     locations = recording.get_channel_locations()
-        #
-        #     # Get electrodes
-        #     electrodes = recording.get_property('electrode')
+        print(f"Computing .mat files for {len(recordings)} recordings")
+        for rec_i in tqdm(range(len(recordings))):
+            recording = recordings[rec_i]
+            sorting_folder = cache_folder / f"sorting_templates_{rec_i}"
+
+            locations = recording.get_channel_locations()
+            y_max = np.max(locations[:, 1])
+            y_min = np.min(locations[:, 1])
+            locations[:, 1] = y_max - locations[:, 1] + y_min
+
+            electrodes = recording.get_property("electrode")
+
+            save_dict = {"units": [], "locations": locations, "fs": recording.get_sampling_frequency()}
+
+            if sorting_folder.exists():
+                sorting = si.load_extractor(sorting_folder)
+                templates = sorting.get_property("template")
+                max_channels = np.argmin(np.min(templates, axis=1), axis=1)
+
+                for u_i, u in enumerate(np.atleast_1d(sorting.get_unit_ids())):
+                    channel = max_channels[u_i]
+                    x_max, y_max = locations[channel]
+                    unit_dict = {
+                        "spike_train": sorting.get_unit_spike_train(u),
+                        "x_max": x_max,
+                        "y_max": y_max,
+                        "template": templates[u_i, :, :],
+                        "unit_id": u,
+                        "electrode": electrodes[channel],
+                    }
+                    save_dict["units"].append(unit_dict)
+
+            parent_folder = mat_folder_path / f"{rec_i}" / r"spikes/raw_data"
+            parent_folder.mkdir(parents=True, exist_ok=True)
+            savemat(parent_folder / "t_spk_mat_ks.mat", save_dict)
+            np.savez(parent_folder / "t_spk_npz_ks.npz",
+                     units=save_dict["units"],
+                     locations=save_dict["locations"],
+                     fs=save_dict["fs"])
